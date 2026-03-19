@@ -64,3 +64,109 @@ create table pagos (
     metodo_pago varchar(50) not null,
     foreign key (id_reserva) references reservas(id_reserva) on delete cascade
 );
+
+insert into clientes (nombre, email, telefono) values
+('ana lopez', 'ana.lopez@email.com', '4421112233'),
+('carlos perez', 'cperez@email.com', '4422223344'),
+('maria gomez', 'mgomez@email.com', '4423334455'),
+('jorge ramirez', 'jramirez@email.com', '4424445566'),
+('luisa fernandez', 'lfernandez@email.com', '4425556677'),
+('pedro martinez', 'pmartinez@email.com', '4426667788'),
+('sofia torres', 'storres@email.com', '4427778899'),
+('diego flores', 'dflores@email.com', '4428889900'),
+('laura santiago', 'lsantiago@email.com', '4429990011'),
+('miguel angel', 'mangel@email.com', '4421010101'),
+('carmen salinas', 'csalinas@email.com', '4422020202'),
+('roberto cruz', 'rcruz@email.com', '4423030303'),
+('paula vargas', 'pvargas@email.com', '4424040404'),
+('daniel reyes', 'dreyes@email.com', '4425050505'),
+('elena morales', 'emorales@email.com', '4426060606'),
+('ricardo ortiz', 'rortiz@email.com', '4427070707'),
+('valeria castro', 'vcastro@email.com', '4428080808'),
+('javier luna', 'jluna@email.com', '4429090909'),
+('andrea ruiz', 'aruiz@email.com', '4420101010'),
+('fernando herrera', 'fherrera@email.com', '4421212121');
+
+insert into tipos_habitacion (nombre_tipo, precio_base) values
+('sencilla', 800.00), ('doble', 1200.00), ('triple', 1500.00), ('cuadruple', 1800.00),
+('suite junior', 2500.00), ('suite ejecutiva', 3000.00), ('suite presidencial', 8000.00),
+('penthouse', 12000.00), ('cabaña estandar', 1500.00), ('cabaña familiar', 2200.00),
+('villa de lujo', 5000.00), ('bungalow', 1700.00), ('habitacion con vista al mar', 2000.00),
+('habitacion con jardin', 1600.00), ('habitacion con alberca privada', 3500.00),
+('estudio', 1000.00), ('loft', 1300.00), ('suite nupcial', 4000.00),
+('habitacion accesible', 900.00), ('habitacion economica', 600.00);
+
+insert into habitaciones (numero_habitacion, id_tipo, estado) values
+('101', 1, 'disponible'), ('102', 2, 'ocupada'), ('103', 3, 'disponible'), ('104', 4, 'mantenimiento'),
+('105', 5, 'disponible'), ('106', 6, 'ocupada'), ('201', 7, 'disponible'), ('202', 8, 'disponible'),
+('203', 9, 'ocupada'), ('204', 10, 'disponible'), ('301', 11, 'disponible'), ('302', 12, 'ocupada'),
+('303', 13, 'disponible'), ('304', 14, 'mantenimiento'), ('401', 15, 'disponible'), ('402', 16, 'ocupada'),
+('403', 17, 'disponible'), ('404', 18, 'disponible'), ('501', 19, 'ocupada'), ('502', 20, 'disponible');
+
+insert into servicios (nombre_servicio, precio) values
+('desayuno buffet', 250.00), ('masaje relajante spa', 800.00), ('tintoreria', 150.00),
+('minibar', 300.00), ('transporte aeropuerto', 400.00), ('tour por la ciudad', 600.00),
+('room service - flautas de pollo', 180.00), ('room service - tacos de suadero', 150.00),
+('cuidado de niños', 500.00), ('alquiler de bicicleta', 200.00), ('clase de yoga', 120.00),
+('botella de vino tinto', 750.00), ('cena romantica', 1500.00), ('planchado express', 80.00),
+('alquiler de auto', 1200.00), ('paseo a caballo', 450.00), ('corte de cabello', 350.00),
+('manicura y pedicura', 400.00), ('acceso a club de playa', 600.00), ('paquete fotografico', 1000.00);
+
+insert into reservas (id_cliente, fecha_registro, estado) values
+(1, '2026-02-10 10:00:00', 'finalizada'), (2, '2026-02-12 11:30:00', 'finalizada'),
+(3, '2026-02-15 14:20:00', 'finalizada'), (4, '2026-02-20 09:15:00', 'finalizada'),
+(5, '2026-02-25 16:45:00', 'activa'), (6, '2026-03-01 10:10:00', 'activa'),
+(7, '2026-03-05 12:00:00', 'activa'), (8, '2026-03-08 18:30:00', 'activa'),
+(9, '2026-03-10 08:45:00', 'cancelada'), (10, '2026-03-11 15:20:00', 'activa'),
+(11, '2026-03-12 11:11:00', 'activa'), (12, '2026-03-13 14:00:00', 'activa'),
+(13, '2026-03-14 17:50:00', 'activa'), (14, '2026-03-15 09:30:00', 'activa'),
+(15, '2026-03-16 13:40:00', 'activa'), (16, '2026-03-17 19:15:00', 'activa'),
+(17, '2026-03-18 10:05:00', 'activa'), (18, '2026-03-19 08:00:00', 'activa'),
+(19, '2026-03-19 12:25:00', 'activa'), (20, '2026-03-19 16:10:00', 'activa');
+
+insert into detalle_reservas (id_reserva, id_habitacion, fecha_inicio, fecha_fin) values
+(1, 1, '2026-02-15', '2026-02-18'), (2, 2, '2026-02-18', '2026-02-20'),
+(3, 3, '2026-02-20', '2026-02-25'), (4, 4, '2026-02-22', '2026-02-24'),
+(5, 5, '2026-03-15', '2026-03-20'), (6, 6, '2026-03-18', '2026-03-22'),
+(7, 7, '2026-03-20', '2026-03-25'), (8, 8, '2026-03-22', '2026-03-26'),
+(9, 9, '2026-03-25', '2026-03-28'), (10, 10, '2026-03-26', '2026-03-30'),
+(11, 11, '2026-03-28', '2026-04-02'), (12, 12, '2026-03-29', '2026-04-05'),
+(13, 13, '2026-04-01', '2026-04-04'), (14, 14, '2026-04-02', '2026-04-06'),
+(15, 15, '2026-04-05', '2026-04-10'), (16, 16, '2026-04-08', '2026-04-12'),
+(17, 17, '2026-04-10', '2026-04-15'), (18, 18, '2026-04-12', '2026-04-18'),
+(19, 19, '2026-04-15', '2026-04-20'), (20, 20, '2026-04-20', '2026-04-25');
+
+
+insert into consumos_servicios (id_reserva, id_servicio, cantidad, fecha_consumo) values
+(1, 1, 2, '2026-02-16 08:30:00'), (2, 4, 1, '2026-02-19 20:15:00'),
+(3, 2, 1, '2026-02-21 11:00:00'), (4, 7, 2, '2026-02-23 14:30:00'),
+(5, 8, 3, '2026-03-16 21:00:00'), (6, 5, 1, '2026-03-18 10:00:00'),
+(7, 12, 1, '2026-03-21 19:45:00'), (8, 3, 2, '2026-03-23 09:20:00'),
+(9, 10, 2, '2026-03-26 16:00:00'), (10, 1, 4, '2026-03-27 08:00:00'),
+(11, 6, 1, '2026-03-29 10:30:00'), (12, 13, 1, '2026-03-30 20:00:00'),
+(13, 9, 1, '2026-04-02 18:00:00'), (14, 15, 1, '2026-04-03 09:00:00'),
+(15, 11, 2, '2026-04-06 07:30:00'), (16, 20, 1, '2026-04-09 12:00:00'),
+(17, 14, 3, '2026-04-11 15:45:00'), (18, 17, 1, '2026-04-13 11:15:00'),
+(19, 19, 2, '2026-04-16 10:00:00'), (20, 18, 1, '2026-04-21 14:20:00');
+
+insert into pagos (id_reserva, monto, metodo_pago, fecha_pago) values
+(1, 2900.00, 'tarjeta de credito', '2026-02-18 10:00:00'),
+(2, 2700.00, 'efectivo', '2026-02-20 11:30:00'),
+(3, 8300.00, 'transferencia', '2026-02-25 12:00:00'),
+(4, 3960.00, 'tarjeta de debito', '2026-02-24 09:15:00'),
+(5, 12950.00, 'tarjeta de credito', '2026-03-15 16:45:00'),
+(6, 12400.00, 'transferencia', '2026-03-18 10:10:00'),
+(7, 40750.00, 'tarjeta de credito', '2026-03-20 12:00:00'),
+(8, 48300.00, 'efectivo', '2026-03-22 18:30:00'),
+(9, 6400.00, 'tarjeta de debito', '2026-03-25 08:45:00'),
+(10, 9800.00, 'transferencia', '2026-03-26 15:20:00'),
+(11, 25600.00, 'tarjeta de credito', '2026-03-28 11:11:00'),
+(12, 13400.00, 'efectivo', '2026-03-29 14:00:00'),
+(13, 6500.00, 'tarjeta de debito', '2026-04-01 17:50:00'),
+(14, 7600.00, 'transferencia', '2026-04-02 09:30:00'),
+(15, 17740.00, 'tarjeta de credito', '2026-04-05 13:40:00'),
+(16, 5000.00, 'efectivo', '2026-04-08 19:15:00'),
+(17, 6740.00, 'tarjeta de debito', '2026-04-10 10:05:00'),
+(18, 24350.00, 'transferencia', '2026-04-12 08:00:00'),
+(19, 5700.00, 'tarjeta de credito', '2026-04-15 12:25:00'),
+(20, 3400.00, 'efectivo', '2026-04-20 16:10:00');
