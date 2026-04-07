@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
 async function login(){
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
-    const mensaje = document.getElementById('mensaje');
     const btn = document.getElementById('btnLogin');
     
    if(!username || !password){
@@ -39,7 +38,7 @@ async function login(){
        localStorage.setItem("token",data.token);
        localStorage.setItem("user", JSON.stringify(data.usuario));
 
-       mostrarMensaje("Credencailes correctas", "success");
+       mostrarMensaje("Credenciales correctas", "success");
        
        setTimeout(()=>{
           const rol = data.usuario.rol.toLowerCase();
