@@ -1,17 +1,47 @@
 create database sistemahotelero;
 use sistemahotelero; 
 
+create table roles(
+   id_rol int auto_increment primary key,
+   nombre_rol varchar(100) unique
+);
+
 create table clientes (
     id_cliente int auto_increment primary key,
-    nombre varchar(100) not null,
+    nombre varchar(50) not null,
+    ap varchar(50) not null,
+    am varchar(50) not null,
     email varchar(100) unique not null,
     telefono varchar(15) not null
 );
 
+CREATE TABLE empleados (
+    id_empleado int AUTO_INCREMENT primary key,
+    nombre varchar(50) not null,
+    ap varchar(50) not null,
+    am varchar(50) not null,
+    telefono varchar(15),
+    email varchar(100) unique
+);
+
+
+create table usuarios (
+   id_usuario int auto_increment primary key,
+   username varchar(50) unique,
+   contrasena varchar(255),
+   id_rol int,
+   id_cliente int,
+   id_empleado int,
+   foreign key(id_rol) references roles(id_rol),
+   foreign key(id_cliente) references clientes(id_cliente),
+   foreign key(id_empleado) references empleados(id_empleado)
+);
+
+
 create table tipos_habitacion (
     id_tipo int auto_increment primary key,
     nombre_tipo varchar(50) not null,
-    precio_base decimal(10,2) not null
+    precio_base decimal(10,2) not null check(precio_base > 0)
 );
 
 create table habitaciones (
@@ -25,7 +55,7 @@ create table habitaciones (
 create table servicios (
     id_servicio int auto_increment primary key,
     nombre_servicio varchar(100) not null,
-    precio decimal(10,2) not null
+    precio decimal(10,2) not null check(precio > 0)
 );
 
 create table reservas (
@@ -59,33 +89,63 @@ create table consumos_servicios (
 create table pagos (
     id_pago int auto_increment primary key,
     id_reserva int not null,
-    monto decimal(10,2) not null,
+    monto decimal(10,2) not null check(monto > 0),
     fecha_pago datetime default current_timestamp,
     metodo_pago varchar(50) not null,
     foreign key (id_reserva) references reservas(id_reserva) on delete cascade
 );
 
-insert into clientes (nombre, email, telefono) values
-('ana lopez', 'ana.lopez@email.com', '4421112233'),
-('carlos perez', 'cperez@email.com', '4422223344'),
-('maria gomez', 'mgomez@email.com', '4423334455'),
-('jorge ramirez', 'jramirez@email.com', '4424445566'),
-('luisa fernandez', 'lfernandez@email.com', '4425556677'),
-('pedro martinez', 'pmartinez@email.com', '4426667788'),
-('sofia torres', 'storres@email.com', '4427778899'),
-('diego flores', 'dflores@email.com', '4428889900'),
-('laura santiago', 'lsantiago@email.com', '4429990011'),
-('miguel angel', 'mangel@email.com', '4421010101'),
-('carmen salinas', 'csalinas@email.com', '4422020202'),
-('roberto cruz', 'rcruz@email.com', '4423030303'),
-('paula vargas', 'pvargas@email.com', '4424040404'),
-('daniel reyes', 'dreyes@email.com', '4425050505'),
-('elena morales', 'emorales@email.com', '4426060606'),
-('ricardo ortiz', 'rortiz@email.com', '4427070707'),
-('valeria castro', 'vcastro@email.com', '4428080808'),
-('javier luna', 'jluna@email.com', '4429090909'),
-('andrea ruiz', 'aruiz@email.com', '4420101010'),
-('fernando herrera', 'fherrera@email.com', '4421212121');
+insert into roles (nombre_rol) values
+('admin'),
+('recepcionista'),
+('cliente');
+
+insert into clientes (nombre, ap, am, email, telefono) values
+('Ana','Lopez','Gomez','ana.lopez@email.com','4421112233'),
+('Carlos','Perez','Ramirez','cperez@email.com','4422223344'),
+('Maria','Gomez','Hernandez','mgomez@email.com','4423334455'),
+('Jorge','Ramirez','Lopez','jramirez@email.com','4424445566'),
+('Luisa','Fernandez','Torres','lfernandez@email.com','4425556677'),
+('Pedro','Martinez','Diaz','pmartinez@email.com','4426667788'),
+('Sofia','Torres','Garcia','storres@email.com','4427778899'),
+('Diego','Flores','Sanchez','dflores@email.com','4428889900'),
+('Laura','Santiago','Cruz','lsantiago@email.com','4429990011'),
+('Miguel','Angel','Morales','mangel@email.com','4421010101'),
+('Carmen','Salinas','Ortiz','csalinas@email.com','4422020202'),
+('Roberto','Cruz','Reyes','rcruz@email.com','4423030303'),
+('Paula','Vargas','Ruiz','pvargas@email.com','4424040404'),
+('Daniel','Reyes','Castro','dreyes@email.com','4425050505'),
+('Elena','Morales','Herrera','emorales@email.com','4426060606'),
+('Ricardo','Ortiz','Luna','rortiz@email.com','4427070707'),
+('Valeria','Castro','Vega','vcastro@email.com','4428080808'),
+('Javier','Luna','Mendoza','jluna@email.com','4429090909'),
+('Andrea','Ruiz','Flores','aruiz@email.com','4420101010'),
+('Fernando','Herrera','Nava','fherrera@email.com','4421212121');
+
+insert into empleados (nombre, ap, am, telefono, email) values
+('Juan','Perez','Lopez','4421000001','juan@gmail.com'),
+('Luis','Garcia','Ramirez','4421000002','luis@gmail.com'),
+('Maria','Torres','Diaz','4421000003','maria@gmail.com'),
+('Ana','Martinez','Cruz','4421000004','ana@gmail.com'),
+('Carlos','Lopez','Reyes','4421000005','carlos@gmail.com'),
+('Sofia','Hernandez','Vega','4421000006','sofia@gmail.com'),
+('Pedro','Sanchez','Morales','4421000007','pedro@gmail.com'),
+('Laura','Diaz','Ortiz','4421000008','laura@gmail.com'),
+('Miguel','Rivera','Castro','4421000009','miguel@gmail.com'),
+('Carmen','Cruz','Luna','4421000010','carmen@gmail.com'),
+('Jorge','Flores','Mendoza','4421000011','jorge@gmail.com'),
+('Daniel','Morales','Nava','4421000012','daniel@gmail.com'),
+('Elena','Ruiz','Vargas','4421000013','elena@gmail.com'),
+('Ricardo','Ortiz','Perez','4421000014','ricardo@gmail.com'),
+('Valeria','Castro','Lopez','4421000015','valeria@gmail.com'),
+('Fernando','Herrera','Diaz','4421000016','fernando@gmail.com'),
+('Andrea','Luna','Cruz','4421000017','andrea@gmail.com'),
+('Roberto','Vargas','Reyes','4421000018','roberto@gmail.com'),
+('Paula','Reyes','Vega','4421000019','paula@gmail.com'),
+('Diego','Gomez','Morales','4421000020','diego@gmail.com');
+
+
+
 
 insert into tipos_habitacion (nombre_tipo, precio_base) values
 ('sencilla', 800.00), ('doble', 1200.00), ('triple', 1500.00), ('cuadruple', 1800.00),

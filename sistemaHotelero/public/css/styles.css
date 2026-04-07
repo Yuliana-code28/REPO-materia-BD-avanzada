@@ -1,0 +1,99 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: system-ui, Arial;
+}
+
+body {
+    height: 100vh;
+    background: linear-gradient(135deg, #d9e4f5, #f5f7fa);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* CONTENEDOR MÁS GRANDE */
+.login-container {
+    width: 600px;
+    padding: 60px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* TITULO */
+.login-container h2 {
+    margin-bottom: 25px;
+    text-align: center;
+    font-weight: 600;
+    color: #222;
+}
+
+/* INPUTS */
+.input-group {
+    position: relative;
+    margin-bottom: 18px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 14px 45px;
+    border-radius: 25px;
+    border: 1px solid #ddd;
+    font-size: 15px;
+}
+
+/* ICONOS */
+.input-group span {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* OPCIONES */
+.options {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+/* BOTON MÁS GRANDE */
+button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 25px;
+    border: none;
+    background: #3aa0ff;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1f7ed6;
+}
+
+#mensaje {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+}
+
+
+.brand {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center; /* centra horizontal */
+    gap: 0.5rem;
+    margin-bottom: 1rem; /* espacio abajo */
+}
