@@ -1,3 +1,4 @@
+drop database if exists sistemahotelero;
 create database sistemahotelero;
 use sistemahotelero; 
 
@@ -145,7 +146,52 @@ insert into empleados (nombre, ap, am, telefono, email) values
 ('Diego','Gomez','Morales','4421000020','diego@gmail.com');
 
 
+insert into usuarios (username, contrasena, id_rol, id_cliente, id_empleado) values
 
+('Juan1', '123456', 1, NULL, 1),
+
+
+('Luis1', '123456', 2, NULL, 2),
+('Maria1', '123456', 2, NULL, 3),
+('Ana1', '123456', 2, NULL, 4),
+('Carlos1', '123456', 2, NULL, 5),
+('Sofia1', '123456', 2, NULL, 6),
+('Pedro1', '123456', 2, NULL, 7),
+('Laura1', '123456', 2, NULL, 8),
+('Miguel1', '123456', 2, NULL, 9),
+('Carmen1', '123456', 2, NULL, 10),
+('Jorge1', '123456', 2, NULL, 11),
+('Daniel1', '123456', 2, NULL, 12),
+('Elena1', '123456', 2, NULL, 13),
+('Ricardo1', '123456', 2, NULL, 14),
+('Valeria1', '123456', 2, NULL, 15),
+('Fernando1', '123456', 2, NULL, 16),
+('Andrea1', '123456', 2, NULL, 17),
+('Roberto1', '123456', 2, NULL, 18),
+('Paula1', '123456', 2, NULL, 19),
+('Diego1', '123456', 2, NULL, 20),
+
+
+('Ana2', '123456', 3, 1, NULL),
+('Carlos2', '123456', 3, 2, NULL),
+('Maria2', '123456', 3, 3, NULL),
+('Jorge2', '123456', 3, 4, NULL),
+('Luisa2', '123456', 3, 5, NULL),
+('Pedro2', '123456', 3, 6, NULL),
+('Sofia2', '123456', 3, 7, NULL),
+('Diego2', '123456', 3, 8, NULL),
+('Laura2', '123456', 3, 9, NULL),
+('Miguel2', '123456', 3, 10, NULL),
+('Carmen2', '123456', 3, 11, NULL),
+('Roberto2', '123456', 3, 12, NULL),
+('Paula2', '123456', 3, 13, NULL),
+('Daniel2', '123456', 3, 14, NULL),
+('Elena2', '123456', 3, 15, NULL),
+('Ricardo2', '123456', 3, 16, NULL),
+('Valeria2', '123456', 3, 17, NULL),
+('Javier2', '123456', 3, 18, NULL),
+('Andrea2', '123456', 3, 19, NULL),
+('Fernando2', '123456', 3, 20, NULL);
 
 insert into tipos_habitacion (nombre_tipo, precio_base) values
 ('sencilla', 800.00), ('doble', 1200.00), ('triple', 1500.00), ('cuadruple', 1800.00),
