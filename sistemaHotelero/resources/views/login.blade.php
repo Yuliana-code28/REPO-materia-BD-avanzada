@@ -33,7 +33,7 @@
         <label>
             <input type="checkbox"> Recordarme
         </label>
-        <span>¿Olvidaste?</span>
+        <span><a href="/contrasena-recuperar">¿Olvidaste tu contraseña?</a></span>
     </div>
 
     <button id="btnLogin">Entrar</button>

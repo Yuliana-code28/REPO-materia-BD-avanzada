@@ -26,3 +26,11 @@ Route::get('/recepcionista-dashboard', function () {
 Route::get('/cliente-dashboard', function () {
     return view('cliente.cliente-dashboard');
 });
+
+Route::get('/contrasena-recuperar',function(){
+   return view('recuperarContrasena');
+});
+
+Route::get('/cambiar-contrasena', function(){
+   return view('cambiarContrasena');
+});
