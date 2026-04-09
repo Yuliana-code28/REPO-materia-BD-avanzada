@@ -24,7 +24,17 @@ class AuthController extends Controller
 
        $usuario = Usuarios::where('username',$request->username)->first();
 
-       if(!$usuario || !Hash::check($request->password,$usuario->contrasena)){
+       $valida = false;
+       if ($usuario && $usuario->contrasena === $request->password) {
+           // La contraseña que está en texto plano en la BD, se actualiza a Hash automáticamente
+           $usuario->contrasena = Hash::make($request->password);
+           $usuario->save();
+           $valida = true;
+       } else if ($usuario && Hash::check($request->password, $usuario->contrasena)) {
+           $valida = true;
+       }
+
+       if(!$valida){
            return response()->json(['mensaje'=> 'Credenciales Incorrectas'], 401);
        }
        

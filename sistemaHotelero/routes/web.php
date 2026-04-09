@@ -15,6 +15,10 @@ Route::get('/admin-dashboard', function () {
     return view('admin.welcome', compact('clientesCount', 'habitacionesDisponibles', 'reservasActivas', 'ultimasReservas'));
 });
 
+Route::get('/', function () {
+    return redirect('/login');
+});
+
 Route::get('/login', function () {
     return view('login');
 });
