@@ -13,7 +13,9 @@ Route::get('/admin-dashboard', function () {
     $ultimasReservas = Reserva::with('cliente')->orderBy('id_reserva', 'desc')->take(5)->get();
 
     return view('admin.welcome', compact('clientesCount', 'habitacionesDisponibles', 'reservasActivas', 'ultimasReservas'));
-});
+})->name('admin.dashboard');
+
+Route::get('/admin/reservas', [App\Http\Controllers\AdminReservaController::class, 'index'])->name('admin.reservas');
 
 Route::get('/', function () {
     return redirect('/login');

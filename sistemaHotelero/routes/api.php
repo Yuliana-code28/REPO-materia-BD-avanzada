@@ -8,3 +8,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/password/recuperar',[AuthController::class,'olvideMicontrasena']);
 Route::post('/password/restablecer',[AuthController::class,'cambiarContrasena']);
 Route::post('/logout', [AuthController::class, 'logout']);
+
+
+Route::get('/admin/reservas', [App\Http\Controllers\ReservaApiController::class, 'index']);
+Route::patch('/admin/reservas/{id}/cancelar', [App\Http\Controllers\ReservaApiController::class, 'cancelar']);

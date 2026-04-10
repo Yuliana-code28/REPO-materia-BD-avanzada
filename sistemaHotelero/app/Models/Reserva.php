@@ -25,4 +25,14 @@ class Reserva extends Model
     {
         return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');
     }
+
+    public function detalleReservas()
+    {
+        return $this->hasMany(DetalleReserva::class, 'id_reserva', 'id_reserva');
+    }
+
+    public function pagos()
+    {
+        return $this->hasMany(Pago::class, 'id_reserva', 'id_reserva');
+    }
 }
