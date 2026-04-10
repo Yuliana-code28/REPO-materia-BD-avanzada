@@ -24,11 +24,11 @@ Route::get('/login', function () {
 });
 
 Route::get('/recepcionista-dashboard', function () {
-    return view('recepcionista.dashboard_cliente');
+    return view('recepcionista.dashboard_recepcionista');
 });
 
 Route::get('/cliente-dashboard', function () {
-    return view('cliente.cliente-dashboard');
+    return view('cliente.dashboard_cliente');
 });
 
 Route::get('/contrasena-recuperar',function(){

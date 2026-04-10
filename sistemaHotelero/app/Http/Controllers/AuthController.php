@@ -120,6 +120,14 @@ class AuthController extends Controller
           DB::table('password_resets')->where('email', $request->email)->delete();
       
           return response()->json(['mensaje' => 'Contraseña actualizada']);
-}
+        }
+
+        function logout(Request $request){
+             $request->user()->currentAccessToken()->delete();
+
+             return response()->json([
+                 'mensaje' => 'Sesión cerrada correctamente'
+             ]);
+        }
 
 }

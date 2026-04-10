@@ -245,6 +245,7 @@
             <a href="#" class="nav-item">Habitaciones</a>
             <a href="#" class="nav-item">Clientes</a>
             <a href="#" class="nav-item">Facturación</a>
+            <a href="#" class="nav-item" id="btnLogout">Cerrar Sesión</a>
         </nav>
     </aside>
 
@@ -310,6 +311,6 @@
             </table>
         </section>
     </main>
-
+      <script src="{{asset('js/dashboardAdmin.js')}}"></script>
 </body>
 </html>
