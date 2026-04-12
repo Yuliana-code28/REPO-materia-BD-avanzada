@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reserva;
+use App\Models\Cliente;
+use App\Models\Habitacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,6 +20,6 @@ class AdminReservaController extends Controller
 
         $reservas = $query->orderBy('id_reserva', 'desc')->get();
 
-        return view('admin.reservas', compact('reservas'));
+        return view('admin.reservas');
     }
 }

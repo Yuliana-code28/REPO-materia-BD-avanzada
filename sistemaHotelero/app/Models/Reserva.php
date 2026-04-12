@@ -12,7 +12,6 @@ class Reserva extends Model
     protected $table = 'reservas';
     protected $primaryKey = 'id_reserva';
     
-    // Disable laravel default timestamps if we use custom 'fecha_registro'
     public $timestamps = false;
 
     protected $fillable = [

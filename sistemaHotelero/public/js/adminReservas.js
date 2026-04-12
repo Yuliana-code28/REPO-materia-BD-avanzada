@@ -51,21 +51,50 @@ function renderizarTabla(datos) {
                 $${parseFloat(reserva.costo_total).toLocaleString('en-US', {minimumFractionDigits: 2})}
             </td>
             <td>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button class="action-btn" title="Ver Detalle" style="color: var(--primary); background: none; border: none; cursor: pointer;">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                    </button>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                     ${reserva.estado === 'activa' ? `
-                        <button class="action-btn" title="Cancelar" onclick="confirmarCancelacion(${reserva.id_reserva})" style="color: var(--warning); background: none; border: none; cursor: pointer;">
-                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <button class="action-badge" onclick="confirmarFinalizacion(${reserva.id_reserva})" style="background: rgba(16, 185, 129, 0.05); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                            Finalizar
                         </button>
-                    ` : ''}
+                        <button class="action-badge" onclick="confirmarCancelacion(${reserva.id_reserva})" style="background: rgba(245, 158, 11, 0.05); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                            Cancelar
+                        </button>
+                    ` : '<span style="color: var(--text-muted); font-size: 0.8rem;">Sin acciones</span>'}
                 </div>
             </td>
         </tr>
     `).join('');
 }
 
+
+async function confirmarFinalizacion(id) {
+    if (confirm('¿Deseas marcar esta reservación como FINALIZADA? Esto liberará la habitación inmediatamente.')) {
+        try {
+            const respuesta = await fetch(`/api/admin/reservas/${id}/finalizar`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                }
+            });
+
+            const resultado = await respuesta.json();
+
+            if (resultado.success) {
+                alert(resultado.message);
+                const filtroActivo = document.querySelector('.filter-btn.active')?.dataset.estado || '';
+                obtenerReservas(filtroActivo);
+            } else {
+                alert('Error: ' + resultado.message);
+            }
+        } catch (error) {
+            console.error('Error al finalizar:', error);
+            alert('Ocurrió un error al procesar la finalización.');
+        }
+    }
+}
 
 async function confirmarCancelacion(id) {
     if (confirm('¿Estás seguro de que deseas cancelar esta reservación? Esta acción liberará la habitación automáticamente.')) {
@@ -110,6 +139,28 @@ function formatearFecha(cadenaFecha) {
 document.addEventListener('DOMContentLoaded', () => {
     // Carga inicial
     obtenerReservas();
+    cargarDatosFormularioModal();
+
+    async function cargarDatosFormularioModal() {
+        try {
+            const res = await fetch('/api/admin/reservas/form-data');
+            const data = await res.json();
+
+            const selectCliente = document.getElementById('id_cliente');
+            if (selectCliente && data.clientes) {
+                selectCliente.innerHTML = '<option value="">Seleccione un cliente...</option>' + 
+                    data.clientes.map(c => `<option value="${c.id_cliente}">${c.nombre} ${c.ap} (${c.email})</option>`).join('');
+            }
+
+            // Nota: El selector de habitaciones ya no se carga aquí, 
+            // sino dinámicamente en actualizarDisponibilidadHabitaciones()
+
+        } catch (error) {
+            console.error('Error al cargar datos del formulario:', error);
+            const selectCliente = document.getElementById('id_cliente');
+            if (selectCliente) selectCliente.innerHTML = '<option value="">Error al cargar clientes</option>';
+        }
+    }
 
     // Filtros
     document.querySelectorAll('.filter-btn').forEach(boton => {
@@ -133,4 +184,178 @@ document.addEventListener('DOMContentLoaded', () => {
             renderizarTabla(filtrados);
         });
     }
+
+    // Cálculo automático de costo
+    async function calcularCosto() {
+        const idHabitacionInput = document.getElementById('id_habitacion');
+        const fechaInicioInput = document.getElementById('fecha_inicio');
+        const fechaFinInput = document.getElementById('fecha_fin');
+        const montoPagoInput = document.getElementById('monto_pago');
+
+        if (!idHabitacionInput || !fechaInicioInput || !fechaFinInput || !montoPagoInput) return;
+
+        const id_habitacion = idHabitacionInput.value;
+        const fecha_inicio = fechaInicioInput.value;
+        const fecha_fin = fechaFinInput.value;
+
+        if (!id_habitacion || !fecha_inicio || !fecha_fin) {
+            montoPagoInput.value = '';
+            return;
+        }
+
+        try {
+            montoPagoInput.value = 'Calculando...';
+            const res = await fetch(`/api/admin/reservas/calcular-costo?id_habitacion=${id_habitacion}&fecha_inicio=${fecha_inicio}&fecha_fin=${fecha_fin}`);
+            const data = await res.json();
+            
+            if (data.success && data.costo !== null) {
+                montoPagoInput.value = parseFloat(data.costo).toFixed(2);
+            } else {
+                montoPagoInput.value = '';
+            }
+        } catch (error) {
+            console.error('Error calculando costo:', error);
+            montoPagoInput.value = '';
+        }
+    }
+
+    // Filtrado de disponibilidad por fechas
+    async function actualizarDisponibilidadHabitaciones() {
+        const fechaInicio = document.getElementById('fecha_inicio').value;
+        const fechaFin = document.getElementById('fecha_fin').value;
+        const selectHab = document.getElementById('id_habitacion');
+
+        if (!fechaInicio || !fechaFin || !selectHab) {
+            if(selectHab) {
+                selectHab.disabled = true;
+                selectHab.innerHTML = '<option value="">Seleccione primero las fechas...</option>';
+            }
+            return;
+        }
+
+        // Validar que la fecha fin sea después del inicio antes de consultar
+        if (new Date(fechaFin) <= new Date(fechaInicio)) {
+            selectHab.disabled = true;
+            selectHab.innerHTML = '<option value="">La fecha fin debe ser mayor al inicio</option>';
+            return;
+        }
+
+        try {
+            selectHab.disabled = true;
+            selectHab.innerHTML = '<option value="">Consultando disponibilidad...</option>';
+            
+            const res = await fetch(`/api/admin/reservas/disponibilidad?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`);
+            const habitaciones = await res.json();
+
+            if (habitaciones.length === 0) {
+                selectHab.innerHTML = '<option value="">No hay habitaciones disponibles para estas fechas</option>';
+                selectHab.disabled = true;
+            } else {
+                selectHab.innerHTML = '<option value="" data-precio="0">Seleccione una habitación disponible...</option>' + 
+                    habitaciones.map(h => {
+                        return `<option value="${h.id_habitacion}" data-precio="${h.precio_base}">Hab. ${h.numero_habitacion} - ${h.nombre_tipo} ($${parseFloat(h.precio_base).toFixed(2)}/noche)</option>`;
+                    }).join('');
+                selectHab.disabled = false;
+            }
+            
+            // Si la habitación que estaba seleccionada ya no está disponible, limpiar el costo
+            document.getElementById('monto_pago').value = '';
+
+        } catch (error) {
+            console.error('Error al actualizar disponibilidad:', error);
+            selectHab.innerHTML = '<option value="">Error al cargar disponibilidad</option>';
+            selectHab.disabled = true;
+        }
+    }
+
+    const inputHabitacion = document.getElementById('id_habitacion');
+    const inputFechaInicio = document.getElementById('fecha_inicio');
+    const inputFechaFin = document.getElementById('fecha_fin');
+
+    if (inputHabitacion) inputHabitacion.addEventListener('change', calcularCosto);
+    
+    if (inputFechaInicio) {
+        inputFechaInicio.addEventListener('change', () => {
+            actualizarDisponibilidadHabitaciones();
+            calcularCosto();
+        });
+    }
+    
+    if (inputFechaFin) {
+        inputFechaFin.addEventListener('change', () => {
+            actualizarDisponibilidadHabitaciones();
+            calcularCosto();
+        });
+    }
+
+    // Creación de reserva
+    const formCrear = document.getElementById('createReservaForm');
+    if (formCrear) {
+        formCrear.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const button = this.querySelector('button[type="submit"]');
+                const originalText = button.innerHTML;
+                button.innerHTML = 'Guardando...';
+                button.disabled = true;
+
+                const respuesta = await fetch('/api/admin/reservas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const resultado = await respuesta.json();
+
+                button.innerHTML = originalText;
+                button.disabled = false;
+
+                if (resultado.success) {
+                    alert(resultado.message);
+                    closeModal('createModal');
+                    this.reset();
+                    
+                    // Recargar tabla
+                    const filtroActivo = document.querySelector('.filter-btn.active')?.dataset.estado || '';
+                    obtenerReservas(filtroActivo);
+                    
+                    // Opcionalmente recargar todo si es que las habitaciones en el combo deben rehidratarse:
+                    setTimeout(() => window.location.reload(), 1500); // Reload para que se actualice la lista de despues
+                } else {
+                    alert('Error: ' + (resultado.message || 'Datos inválidos.'));
+                }
+            } catch (error) {
+                console.error('Error al enviar:', error);
+                alert('Ocurrió un error al guardar la reservación.');
+                
+                const button = this.querySelector('button[type="submit"]');
+                button.innerHTML = 'Guardar Reserva';
+                button.disabled = false;
+            }
+        });
+    }
 });
+
+function openModal(id) {
+    document.getElementById(id).style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}

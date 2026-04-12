@@ -22,9 +22,13 @@
         <nav class="nav">
             <a href="/admin-dashboard" class="nav-item {{ Request::is('admin-dashboard') ? 'active' : '' }}">Dashboard</a>
             <a href="/admin/reservas" class="nav-item {{ Request::is('admin/reservas*') ? 'active' : '' }}">Reservaciones</a>
-            <a href="#" class="nav-item">Habitaciones</a>
-            <a href="#" class="nav-item">Clientes</a>
-            <a href="#" class="nav-item">Facturación</a>
+            <a href="/admin/habitaciones" class="nav-item {{ Request::is('admin/habitaciones*') ? 'active' : '' }}">Habitaciones</a>
+            <a href="/admin/clientes" class="nav-item {{ Request::is('admin/clientes*') ? 'active' : '' }}">Clientes</a>
+            <a href="/admin/empleados" class="nav-item {{ Request::is('admin/empleados*') ? 'active' : '' }}">
+                
+                Empleados
+            </a>
+            <a href="/admin/facturacion" class="nav-item {{ Request::is('admin/facturacion*') ? 'active' : '' }}">Facturación</a>
             <a href="#" class="nav-item" id="btnLogout">Cerrar Sesión</a>
         </nav>
     </aside>

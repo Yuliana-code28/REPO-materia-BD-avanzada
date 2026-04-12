@@ -8,7 +8,7 @@
         <h1>Vista General</h1>
         <p style="color: var(--text-muted); margin-top: 0.25rem;">Bienvenido de vuelta. Aquí está el resumen de hoy.</p>
     </div>
-    <button class="btn-primary">+ Nueva Reserva</button>
+    <button class="btn-primary" onclick="window.location.href='{{ route('admin.reservas') }}'">Ver Reservaciones</button>
 </header>
 
 <section class="stats-grid">

@@ -17,6 +17,15 @@ Route::get('/admin-dashboard', function () {
 
 Route::get('/admin/reservas', [App\Http\Controllers\AdminReservaController::class, 'index'])->name('admin.reservas');
 
+Route::get('/admin/habitaciones', [App\Http\Controllers\AdminHabitacionController::class, 'index'])->name('admin.habitaciones');
+Route::post('/admin/habitaciones', [App\Http\Controllers\AdminHabitacionController::class, 'store'])->name('admin.habitaciones.store');
+Route::put('/admin/habitaciones/{id}', [App\Http\Controllers\AdminHabitacionController::class, 'update'])->name('admin.habitaciones.update');
+Route::delete('/admin/habitaciones/{id}', [App\Http\Controllers\AdminHabitacionController::class, 'destroy'])->name('admin.habitaciones.destroy');
+
+Route::get('/admin/clientes', [App\Http\Controllers\AdminClienteController::class, 'index'])->name('admin.clientes');
+Route::get('/admin/empleados', [App\Http\Controllers\AdminEmpleadoController::class, 'index'])->name('admin.empleados');
+Route::get('/admin/facturacion', [App\Http\Controllers\AdminFacturacionController::class, 'index'])->name('admin.facturacion');
+
 Route::get('/', function () {
     return redirect('/login');
 });

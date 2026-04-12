@@ -283,6 +283,7 @@ insert into pagos (id_reserva, monto, metodo_pago, fecha_pago) values
 
 -- Justificación: Se indexa el email de clientes para búsquedas rápidas durante el login y registro.
 -- Se indexa el número de habitación para agilizar la consulta de disponibilidad.
+--ya utilizada
 CREATE INDEX idx_cliente_email ON clientes(email);
 CREATE INDEX idx_habitacion_numero ON habitaciones(numero_habitacion);
 
@@ -294,6 +295,7 @@ DELIMITER //
 
 -- Función: Calcular Costo de Estancia
 -- Descripción: Calcula el costo base de la habitación multiplicado por los días de estancia.
+-- ya utlizada
 CREATE FUNCTION fn_costo_estancia(p_id_reserva INT) 
 RETURNS DECIMAL(10,2)
 DETERMINISTIC
@@ -312,6 +314,7 @@ END //
 
 -- Función: Total Reservas Cliente
 -- Descripción: Retorna el número total de reservas realizadas por un cliente específico.
+--ya ulizada
 CREATE FUNCTION fn_total_reservas_cliente(p_id_cliente INT) 
 RETURNS INT
 DETERMINISTIC
@@ -329,7 +332,8 @@ DELIMITER ;
 
 -- Vista: Reservas (Completa)
 -- Objetivo: Mostrar la información consolidada de las reservas para el dashboard administrativo.
-CREATE VIEW vw_reservas AS
+--ya utilizada
+CREATE VIEW vw_reservas AS 
 SELECT 
     r.id_reserva,
     CONCAT(c.nombre, ' ', c.ap) AS nombre_cliente,
@@ -346,6 +350,7 @@ LEFT JOIN habitaciones h ON dr.id_habitacion = h.id_habitacion;
 
 -- Vista: Historial de Clientes
 -- Objetivo: Resumen estadístico de cada cliente para análisis de mercadeo.
+--ya utlizada
 CREATE VIEW vw_historial_clientes AS
 SELECT 
     c.id_cliente,
@@ -415,10 +420,12 @@ CREATE PROCEDURE sp_registrar_reserva(
 )
 BEGIN
     DECLARE v_id_reserva INT;
+    DECLARE v_costo_calculado DECIMAL(10,2);
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
+        GET DIAGNOSTICS CONDITION 1 @sqlstate = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;
         ROLLBACK;
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error en la transacción: Registro de reserva fallido.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = @text;
     END;
 
     START TRANSACTION;
@@ -431,9 +438,12 @@ BEGIN
         INSERT INTO detalle_reservas (id_reserva, id_habitacion, fecha_inicio, fecha_fin)
         VALUES (v_id_reserva, p_id_habitacion, p_fecha_inicio, p_fecha_fin);
 
+        -- Calculamos el costo con la función en vez de confiar en la entrada del front
+        SET v_costo_calculado = fn_costo_estancia(v_id_reserva);
+
         -- 3. Insertar Pago
         INSERT INTO pagos (id_reserva, monto, metodo_pago, fecha_pago)
-        VALUES (v_id_reserva, p_monto_pago, p_metodo_pago, CURRENT_TIMESTAMP);
+        VALUES (v_id_reserva, v_costo_calculado, p_metodo_pago, CURRENT_TIMESTAMP);
 
     COMMIT;
 END //
@@ -448,11 +458,11 @@ BEGIN
     SELECT h.*, th.nombre_tipo, th.precio_base
     FROM habitaciones h
     JOIN tipos_habitacion th ON h.id_tipo = th.id_tipo
-    WHERE h.id_habitacion NOT IN (
+    WHERE h.estado != 'mantenimiento'
+    AND h.id_habitacion NOT IN (
         SELECT id_habitacion 
         FROM detalle_reservas 
-        WHERE (p_fecha_inicio BETWEEN fecha_inicio AND fecha_fin)
-        OR (p_fecha_fin BETWEEN fecha_inicio AND fecha_fin)
+        WHERE (p_fecha_inicio < fecha_fin AND p_fecha_fin > fecha_inicio)
     );
 END //
 
