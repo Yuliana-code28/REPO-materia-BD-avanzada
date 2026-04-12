@@ -108,7 +108,7 @@
         <h1>Reservaciones</h1>
         <p style="color: var(--text-muted); margin-top: 0.25rem;">Gestión de entradas, salidas y nuevas reservas.</p>
     </div>
-    <button class="btn-primary" onclick="openModal('createModal')" style="display: flex; align-items: center;">
+    <button class="btn-primary" onclick="abrirModal('createModal')" style="display: flex; align-items: center;">
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 0.5rem;"><path d="M12 4v16m8-8H4"></path></svg>
         Nueva Reserva
     </button>
@@ -151,7 +151,7 @@
 <!-- Modal Crear Reserva -->
 <div id="createModal" class="modal">
     <div class="modal-content">
-        <button class="btn-close" onclick="closeModal('createModal')">&times;</button>
+        <button class="btn-close" onclick="cerrarModal('createModal')">&times;</button>
         <h2 style="margin-top: 0; margin-bottom: 1.5rem;">Nueva Reserva</h2>
         
         <form id="createReservaForm">
@@ -197,7 +197,7 @@
             </div>
             
             <div style="display: flex; justify-content: flex-end; gap: 1rem;">
-                <button type="button" class="btn-primary" style="background: var(--surface); color: var(--text-main); border: 1px solid var(--border);" onclick="closeModal('createModal')">Cancelar</button>
+                <button type="button" class="btn-primary" style="background: var(--surface); color: var(--text-main); border: 1px solid var(--border);" onclick="cerrarModal('createModal')">Cancelar</button>
                 <button type="submit" class="btn-primary">Registrar</button>
             </div>
         </form>

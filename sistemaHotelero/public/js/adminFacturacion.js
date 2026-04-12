@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     cargarDatosFacturacion();
-    cargarReportesFinanceiros();
+    cargarReportesFinancieros();
 });
 
 async function cargarDatosFacturacion() {
@@ -24,7 +24,7 @@ async function cargarDatosFacturacion() {
                 <td style="font-weight: 700;">$${parseFloat(p.monto).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                 <td style="font-size: 0.9rem;">${formatearFechaLarga(p.fecha_pago)}</td>
                 <td>
-                    <span class="method-badge ${getMetodoClass(p.metodo_pago)}">
+                    <span class="method-badge ${obtenerClaseMetodo(p.metodo_pago)}">
                         ${p.metodo_pago}
                     </span>
                 </td>
@@ -39,7 +39,7 @@ async function cargarDatosFacturacion() {
     }
 }
 
-async function cargarReportesFinanceiros() {
+async function cargarReportesFinancieros() {
     try {
         const res = await fetch('/api/admin/facturacion/reportes');
         const data = await res.json();
@@ -136,7 +136,7 @@ function renderizarGraficas(data) {
     });
 }
 
-function getMetodoClass(metodo) {
+function obtenerClaseMetodo(metodo) {
     const m = metodo.toLowerCase();
     if (m.includes('efectivo')) return 'method-efectivo';
     if (m.includes('tarjeta')) return 'method-tarjeta';

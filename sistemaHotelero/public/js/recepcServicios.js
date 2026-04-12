@@ -1,6 +1,6 @@
-document.addEventListener('DOMContentLoaded', loadData);
+document.addEventListener('DOMContentLoaded', cargarDatos);
 
-async function loadData() {
+async function cargarDatos() {
     const list = document.getElementById('activeReservationsList');
     const select = document.getElementById('id_servicio');
     const badge = document.getElementById('countBadge');
@@ -22,7 +22,7 @@ async function loadData() {
             `;
         } else {
             list.innerHTML = reservas.map(r => `
-                <div class="guest-card" onclick="selectReservaParaCargo(${r.id_reserva}, '${r.habitaciones.map(h => h.numero_habitacion).join(', ')}', '${r.cliente.nombre} ${r.cliente.ap}', this)">
+                <div class="guest-card" onclick="seleccionarReservaParaCargo(${r.id_reserva}, '${r.habitaciones.map(h => h.numero_habitacion).join(', ')}', '${r.cliente.nombre} ${r.cliente.ap}', this)">
                     <div class="guest-avatar">
                         <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     </div>
@@ -49,7 +49,7 @@ async function loadData() {
     }
 }
 
-function selectReservaParaCargo(id, room, client, element) {
+function seleccionarReservaParaCargo(id, room, client, element) {
     document.querySelectorAll('.guest-card').forEach(c => c.classList.remove('selected'));
     element.classList.add('selected');
 

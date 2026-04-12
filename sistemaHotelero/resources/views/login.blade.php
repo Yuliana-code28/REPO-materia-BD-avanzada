@@ -20,12 +20,21 @@
     <h2>Iniciar sesión</h2>
 
     <div class="input-group">
-        <span>👤</span>
+        <span>
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 7a4 4 0 100-8 4 4 0 000 8z"></path>
+            </svg>
+        </span>
         <input type="text" id="username" placeholder="Usuario">
     </div>
 
     <div class="input-group">
-        <span>🔒</span>
+        <span>
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0110 0v4"></path>
+            </svg>
+        </span>
         <input type="password" id="password" placeholder="Contraseña">
     </div>
 
@@ -37,6 +46,10 @@
     </div>
 
     <button id="btnLogin">Entrar</button>
+
+    <p style="text-align: center; margin-top: 15px; font-size: 14px;">
+        ¿No tienes cuenta? <a href="/registro">Regístrate aquí</a>
+    </p>
 
     <p id="mensaje"></p>
 </div>

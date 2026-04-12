@@ -47,6 +47,10 @@ Route::prefix('recepcionista')->group(function () {
 Route::get('/cliente-dashboard', [App\Http\Controllers\ClienteDashboardController::class, 'index'])->name('cliente.dashboard');
 Route::get('/cliente/reservas', [App\Http\Controllers\ClienteDashboardController::class, 'reservas'])->name('cliente.reservas');
 
+Route::get('/registro', function () {
+    return view('registro');
+});
+
 Route::get('/contrasena-recuperar',function(){
    return view('recuperarContrasena');
 });

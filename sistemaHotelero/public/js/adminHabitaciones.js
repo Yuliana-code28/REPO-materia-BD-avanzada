@@ -46,7 +46,7 @@ function renderizarTabla(datos) {
                 </td>
                 <td class="action-group">
                     <div style="display: flex; gap: 0.6rem;">
-                        <button class="filter-btn" style="padding: 0.4rem 0.8rem; background: #f9fafb; color: #374151; border: 1px solid #d1d5db; display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 500; border-radius: 6px; cursor: pointer; transition: all 0.2s;" onclick="openEditModal(${habitacion.id_habitacion}, '${habitacion.numero_habitacion}', ${habitacion.id_tipo}, '${habitacion.estado}')">
+                        <button class="filter-btn" style="padding: 0.4rem 0.8rem; background: #f9fafb; color: #374151; border: 1px solid #d1d5db; display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 500; border-radius: 6px; cursor: pointer; transition: all 0.2s;" onclick="abrirModalEdicion(${habitacion.id_habitacion}, '${habitacion.numero_habitacion}', ${habitacion.id_tipo}, '${habitacion.estado}')">
                             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                             Editar
                         </button>
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (result.success) {
                     alert(result.message);
-                    closeModal('createModal');
+                    cerrarModal('createModal');
                     this.reset();
                     const filtroActivo = document.querySelector('.filter-btn.active')?.dataset.estado || '';
                     obtenerHabitaciones(filtroActivo);
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (result.success) {
                     alert(result.message);
-                    closeModal('editModal');
+                    cerrarModal('editModal');
                     const filtroActivo = document.querySelector('.filter-btn.active')?.dataset.estado || '';
                     obtenerHabitaciones(filtroActivo);
                 } else {
@@ -173,23 +173,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function openModal(id) {
+function abrirModal(id) {
     document.getElementById(id).style.display = 'block';
     document.body.style.overflow = 'hidden'; // Prevent scrolling
 }
 
-function closeModal(id) {
+function cerrarModal(id) {
     document.getElementById(id).style.display = 'none';
     document.body.style.overflow = 'auto';
 }
 
-function openEditModal(id, numero, tipo, estado) {
+function abrirModalEdicion(id, numero, tipo, estado) {
     document.getElementById('editTitleNum').innerText = '#' + numero;
     document.getElementById('edit_id_habitacion').value = id;
     document.getElementById('edit_numero').value = numero;
     document.getElementById('edit_tipo').value = tipo;
     document.getElementById('edit_estado').value = estado;
-    openModal('editModal');
+    abrirModal('editModal');
 }
 
 async function eliminarHabitacion(id) {

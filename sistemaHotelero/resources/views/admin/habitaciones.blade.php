@@ -12,7 +12,7 @@
         <h1>Habitaciones</h1>
         <p style="color: var(--text-muted); margin-top: 0.25rem;">Administra el inventario de habitaciones, tipos y estados.</p>
     </div>
-    <button class="btn-primary" onclick="openModal('createModal')" style="display: flex; align-items: center;">
+    <button class="btn-primary" onclick="abrirModal('createModal')" style="display: flex; align-items: center;">
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 0.5rem;"><path d="M12 4v16m8-8H4"></path></svg>
         Nueva Habitación
     </button>
@@ -54,7 +54,7 @@
 <!-- Modal Crear -->
 <div id="createModal" class="modal">
     <div class="modal-content">
-        <button class="btn-close" onclick="closeModal('createModal')">&times;</button>
+        <button class="btn-close" onclick="cerrarModal('createModal')">&times;</button>
         <h2 style="margin-top: 0; margin-bottom: 1.5rem;">Nueva Habitación</h2>
         
         <form id="createHabitacionForm">
@@ -80,7 +80,7 @@
             </div>
             
             <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
-                <button type="button" class="btn-primary" style="background: var(--surface); color: var(--text-main); border: 1px solid var(--border);" onclick="closeModal('createModal')">Cancelar</button>
+                <button type="button" class="btn-primary" style="background: var(--surface); color: var(--text-main); border: 1px solid var(--border);" onclick="cerrarModal('createModal')">Cancelar</button>
                 <button type="submit" class="btn-primary">Guardar</button>
             </div>
         </form>
@@ -90,7 +90,7 @@
 <!-- Modal Editar -->
 <div id="editModal" class="modal">
     <div class="modal-content">
-        <button class="btn-close" onclick="closeModal('editModal')">&times;</button>
+        <button class="btn-close" onclick="cerrarModal('editModal')">&times;</button>
         <h2 style="margin-top: 0; margin-bottom: 1.5rem;">Editar Habitación <span id="editTitleNum" style="color: var(--primary);"></span></h2>
         
         <form id="editHabitacionForm">
@@ -118,7 +118,7 @@
             </div>
             
             <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
-                <button type="button" class="btn-primary" style="background: var(--surface); color: var(--text-main); border: 1px solid var(--border);" onclick="closeModal('editModal')">Cancelar</button>
+                <button type="button" class="btn-primary" style="background: var(--surface); color: var(--text-main); border: 1px solid var(--border);" onclick="cerrarModal('editModal')">Cancelar</button>
                 <button type="submit" class="btn-primary">Actualizar Cambios</button>
             </div>
         </form>

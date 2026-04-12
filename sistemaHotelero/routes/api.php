@@ -11,6 +11,7 @@ use App\Http\Controllers\ServicioConsumoController;
 use App\Http\Controllers\AdminFacturacionController;
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/registro', [AuthController::class, 'registro']);
 
 Route::post('/password/recuperar',[AuthController::class,'olvideMicontrasena']);
 Route::post('/password/restablecer',[AuthController::class,'cambiarContrasena']);

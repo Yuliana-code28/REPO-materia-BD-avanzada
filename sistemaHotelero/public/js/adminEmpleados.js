@@ -135,7 +135,7 @@ async function manejarEnvioFormulario(e) {
 
         if (respuesta.ok) {
             alert(resultado.mensaje);
-            closeModal('empleadoModal');
+            cerrarModal('empleadoModal');
             obtenerEmpleados();
         } else {
             alert('Error: ' + (resultado.mensaje || 'Ocurrió un error inesperado'));
@@ -168,7 +168,7 @@ function editarEmpleado(id) {
     document.getElementById('passwordHelp').style.display = 'block';
     document.getElementById('labelPassword').textContent = 'Nueva Contraseña (opcional)';
 
-    openModal('empleadoModal');
+    abrirModal('empleadoModal');
 }
 
 async function eliminarEmpleado(id) {
@@ -193,7 +193,7 @@ async function eliminarEmpleado(id) {
     }
 }
 
-function openModal(id) {
+function abrirModal(id) {
     if (id === 'empleadoModal' && !document.getElementById('id_empleado').value) {
         // Reset form for fresh create
         document.getElementById('empleadoForm').reset();
@@ -206,7 +206,7 @@ function openModal(id) {
     document.getElementById(id).style.display = 'block';
 }
 
-function closeModal(id) {
+function cerrarModal(id) {
     document.getElementById(id).style.display = 'none';
 }
 

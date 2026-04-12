@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (resultado.success) {
                     alert(resultado.message);
-                    closeModal('createModal');
+                    cerrarModal('createModal');
                     this.reset();
                     obtenerReservas();
                 } else {
@@ -296,6 +296,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function openModal(id) { document.getElementById(id).style.display = 'block'; document.body.style.overflow = 'hidden'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; document.body.style.overflow = 'auto'; }
-window.onclick = function(event) { if (event.target.classList.contains('modal')) closeModal(event.target.id); }
+function abrirModal(id) { document.getElementById(id).style.display = 'block'; document.body.style.overflow = 'hidden'; }
+function cerrarModal(id) { document.getElementById(id).style.display = 'none'; document.body.style.overflow = 'auto'; }
+window.onclick = function(event) { if (event.target.classList.contains('modal')) cerrarModal(event.target.id); }

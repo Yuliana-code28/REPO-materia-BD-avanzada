@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", ()=>{
   const btn = document.getElementById('btnLogin');
-  btn.addEventListener("click", login);
+  btn.addEventListener("click", iniciarSesion);
 });
 
-async function login(){
+async function iniciarSesion(){
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
     const btn = document.getElementById('btnLogin');

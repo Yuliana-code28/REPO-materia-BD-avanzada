@@ -312,6 +312,25 @@ BEGIN
     RETURN IFNULL(v_total, 0);
 END //
 
+-- Función: Calcular Costo Proyectado
+-- Descripción: Calcula el costo de una estancia antes de que se cree la reserva oficial.
+CREATE FUNCTION fn_calcular_costo_proyectado(p_id_habitacion INT, p_fecha_inicio DATE, p_fecha_fin DATE)
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+BEGIN
+    DECLARE v_precio DECIMAL(10,2);
+    DECLARE v_dias INT;
+    
+    SELECT th.precio_base INTO v_precio
+    FROM habitaciones h
+    JOIN tipos_habitacion th ON h.id_tipo = th.id_tipo
+    WHERE h.id_habitacion = p_id_habitacion;
+    
+    SET v_dias = DATEDIFF(p_fecha_fin, p_fecha_inicio);
+    
+    RETURN IFNULL(v_precio * v_dias, 0.00);
+END //
+
 -- Función: Total Reservas Cliente
 -- Descripción: Retorna el número total de reservas realizadas por un cliente específico.
 --ya ulizada

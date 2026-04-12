@@ -91,12 +91,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    inputFechaInicio.addEventListener('change', () => {
-        actualizarDisponibilidad();
+    inputFechaInicio.addEventListener('change', async () => {
+        await actualizarDisponibilidad();
         calcularCosto();
     });
-    inputFechaFin.addEventListener('change', () => {
-        actualizarDisponibilidad();
+    inputFechaFin.addEventListener('change', async () => {
+        await actualizarDisponibilidad();
         calcularCosto();
     });
     selectHab.addEventListener('change', calcularCosto);

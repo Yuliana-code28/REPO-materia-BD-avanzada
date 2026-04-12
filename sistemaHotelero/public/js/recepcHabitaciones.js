@@ -9,23 +9,23 @@ async function cargarHabitaciones() {
     try {
         const res = await fetch('/api/admin/habitaciones');
         habitaciones = await res.json();
-        renderGrid(habitaciones);
+        renderizarGrilla(habitaciones);
     } catch (e) {
         console.error('Error al cargar habitaciones:', e);
         grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--warning); padding: 2rem;">Error al cargar datos.</div>';
     }
 }
 
-function renderGrid(data) {
+function renderizarGrilla(datos) {
     const grid = document.getElementById('roomGrid');
     if(!grid) return;
 
-    if (data.length === 0) {
+    if (datos.length === 0) {
         grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 4rem;">No se encontraron habitaciones.</div>';
         return;
     }
 
-    grid.innerHTML = data.map(h => {
+    grid.innerHTML = datos.map(h => {
         let typeIcon = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>';
         const typeLower = (h.tipo?.nombre_tipo || '').toLowerCase();
         
@@ -71,9 +71,9 @@ function filtrarHabitaciones(filtro, element) {
     element.classList.add('active');
     
     if(filtro === 'todas') {
-        renderGrid(habitaciones);
+        renderizarGrilla(habitaciones);
     } else {
-        renderGrid(habitaciones.filter(h => h.estado === filtro));
+        renderizarGrilla(habitaciones.filter(h => h.estado === filtro));
     }
 }
 

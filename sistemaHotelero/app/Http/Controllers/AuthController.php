@@ -13,6 +13,64 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    public function registro(Request $request) {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'ap' => 'required|string|max:50',
+            'am' => 'required|string|max:50',
+            'email' => 'required|email|unique:clientes,email',
+            'telefono' => 'required|string|max:20',
+            'username' => 'required|string|unique:usuarios,username',
+            'password' => 'required|string|min:6|confirmed'
+        ], [
+            'nombre.required' => 'El nombre es obligatorio.',
+            'ap.required' => 'El apellido paterno es obligatorio.',
+            'am.required' => 'El apellido materno es obligatorio.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El formato del correo electrónico es inválido.',
+            'email.unique' => 'Este correo electrónico ya está registrado.',
+            'telefono.required' => 'El teléfono es obligatorio.',
+            'username.required' => 'El nombre de usuario es obligatorio.',
+            'username.unique' => 'El nombre de usuario ya está en uso.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+            'password.confirmed' => 'La confirmación de la contraseña no coincide.'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $cliente = Cliente::create([
+                'nombre' => $request->nombre,
+                'ap' => $request->ap,
+                'am' => $request->am,
+                'email' => $request->email,
+                'telefono' => $request->telefono
+            ]);
+
+            Usuarios::create([
+                'username' => $request->username,
+                'contrasena' => Hash::make($request->password),
+                'id_rol' => 3, // Rol de Cliente
+                'id_cliente' => $cliente->id_cliente
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'mensaje' => 'Registro exitoso. Ahora puedes iniciar sesión.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Error al registrar: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 
     
     public function login(Request $request){
@@ -20,6 +78,9 @@ class AuthController extends Controller
        $request->validate([
             'username' => 'required',
             'password' => 'required'
+       ], [
+            'username.required' => 'El nombre de usuario es obligatorio.',
+            'password.required' => 'La contraseña es obligatoria.'
        ]);
 
        $usuario = Usuarios::where('username',$request->username)->first();
@@ -53,8 +114,10 @@ class AuthController extends Controller
     }
 
     public function olvideMicontrasena(Request $request){
-         
-       $request->validate(['email' => 'required|email']);
+                $request->validate(['email' => 'required|email'], [
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El formato del correo electrónico es inválido.'
+        ]);
        
        $Empleado = Empleados::where('email',$request->email)->first();
 
@@ -94,6 +157,13 @@ class AuthController extends Controller
               'email' => 'required|email',
               'token' => 'required',
               'password' => 'required|confirmed|min:6'
+          ], [
+              'email.required' => 'El correo electrónico es obligatorio.',
+              'email.email' => 'El formato del correo electrónico es inválido.',
+              'token.required' => 'El token es obligatorio.',
+              'password.required' => 'La contraseña es obligatoria.',
+              'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+              'password.min' => 'La contraseña debe tener al menos 6 caracteres.'
           ]);
       
           $registro = DB::table('password_resets')

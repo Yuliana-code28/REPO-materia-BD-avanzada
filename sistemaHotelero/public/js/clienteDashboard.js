@@ -19,14 +19,14 @@ async function cargarDatosDashboard() {
         });
         const data = await res.json();
 
-        renderSummary(data);
+        renderizarResumen(data);
         cargarHistorial();
     } catch (error) {
         console.error('Error al cargar dashboard:', error);
     }
 }
 
-function renderSummary(data) {
+function renderizarResumen(data) {
     document.getElementById('statTotalReservas').textContent = data.totalReservas || 0;
     document.getElementById('statTotalInvertido').textContent = `$${parseFloat(data.totalGastado || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
@@ -46,7 +46,7 @@ function renderSummary(data) {
                 <a href="/cliente/reservas" class="btn-primary" style="display: inline-block;">¡Reservar ahora!</a>
             </div>
         `;
-        renderConsumos([]); // Limpiar consumos
+        renderizarConsumos([]); // Limpiar consumos
         return;
     }
 
@@ -76,10 +76,10 @@ function renderSummary(data) {
         </div>
     `;
 
-    renderConsumos(data.consumos || [], data.totalServicios || 0);
+    renderizarConsumos(data.consumos || [], data.totalServicios || 0);
 }
 
-function renderConsumos(consumos, total) {
+function renderizarConsumos(consumos, total) {
     const tbody = document.getElementById('listaConsumosBody');
     const totalCont = document.getElementById('totalServiciosContainer');
     const labelTotal = document.getElementById('labelTotalServicios');
@@ -114,13 +114,13 @@ async function cargarHistorial() {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const reservas = await res.json();
-        renderHistorial(reservas);
+        renderizarHistorial(reservas);
     } catch (error) {
         console.error('Error al cargar historial:', error);
     }
 }
 
-function renderHistorial(reservas) {
+function renderizarHistorial(reservas) {
     const tbody = document.getElementById('historialReservasBody');
     if (reservas.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Aún no has realizado ninguna reserva.</td></tr>';

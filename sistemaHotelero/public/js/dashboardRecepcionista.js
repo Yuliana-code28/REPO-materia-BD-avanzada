@@ -7,14 +7,14 @@ async function cargarDashboard() {
         const res = await fetch('/api/recepcionista/dashboard-data');
         const data = await res.json();
 
-        renderStats(data.stats);
-        renderReservasChart(data.reservas_stats);
+        renderizarEstadisticas(data.stats);
+        renderizarGraficaReservas(data.reservas_stats);
     } catch (error) {
         console.error("Error al cargar dashboard:", error);
     }
 }
 
-function renderReservasChart(stats) {
+function renderizarGraficaReservas(stats) {
     const ctx = document.getElementById('reservasChart');
     if (!ctx) return;
 
@@ -56,7 +56,7 @@ function renderReservasChart(stats) {
     });
 }
 
-function renderStats(stats) {
+function renderizarEstadisticas(stats) {
     const container = document.getElementById('statsGrid');
     if (!container) return;
 
@@ -92,7 +92,7 @@ function renderStats(stats) {
     `;
 }
 
-async function realizarCheckIn(reservaId) {
+async function registrarEntrada(reservaId) {
     try {
         const res = await fetch(`/api/recepcionista/reservas/${reservaId}/check-in`, {
             method: 'POST',
@@ -111,7 +111,7 @@ async function realizarCheckIn(reservaId) {
     } catch(e) { console.error(e); }
 }
 
-async function realizarCheckOut(reservaId) {
+async function registrarSalida(reservaId) {
     if(!confirm('¿Confirmar Check-out y cierre de cuenta?')) return;
     
     try {
