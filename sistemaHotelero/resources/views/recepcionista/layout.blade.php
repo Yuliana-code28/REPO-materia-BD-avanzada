@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Sistema Hotelero - @yield('title', 'Dashboard')</title>
+    <title>Hotel LUX - @yield('title', 'Recepción')</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <!-- Main CSS -->
@@ -20,29 +20,21 @@
             <span style="letter-spacing: -0.025em;">Hotel <span style="color: var(--primary);">LUX</span></span>
         </div>
         <nav class="nav">
-            <a href="/admin-dashboard" class="nav-item {{ Request::is('admin-dashboard') ? 'active' : '' }}">
+            <a href="/recepcionista-dashboard" class="nav-item {{ Request::is('recepcionista-dashboard') ? 'active' : '' }}">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 Inicio
             </a>
-            <a href="/admin/reservas" class="nav-item {{ Request::is('admin/reservas*') ? 'active' : '' }}">
+            <a href="/recepcionista/reservas" class="nav-item {{ Request::is('recepcionista/reservas*') ? 'active' : '' }}">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 Reservaciones
             </a>
-            <a href="/admin/habitaciones" class="nav-item {{ Request::is('admin/habitaciones*') ? 'active' : '' }}">
+            <a href="/recepcionista/habitaciones" class="nav-item {{ Request::is('recepcionista/habitaciones*') ? 'active' : '' }}">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                 Habitaciones
             </a>
-            <a href="/admin/clientes" class="nav-item {{ Request::is('admin/clientes*') ? 'active' : '' }}">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                Clientes
-            </a>
-            <a href="/admin/empleados" class="nav-item {{ Request::is('admin/empleados*') ? 'active' : '' }}">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                Empleados
-            </a>
-            <a href="/admin/facturacion" class="nav-item {{ Request::is('admin/facturacion*') ? 'active' : '' }}">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"></path></svg>
-                Facturación
+            <a href="/recepcionista/servicios" class="nav-item {{ Request::is('recepcionista/servicios*') ? 'active' : '' }}">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                Servicios
             </a>
             
             <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid var(--border);">
@@ -59,7 +51,7 @@
         @yield('content')
     </main>
 
-    @yield('scripts')
     <script src="{{ asset('js/dashboardAdmin.js') }}"></script>
+    @yield('scripts')
 </body>
 </html>

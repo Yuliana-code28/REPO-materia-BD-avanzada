@@ -7,12 +7,13 @@ use App\Models\Habitacion;
 use App\Models\Reserva;
 
 Route::get('/admin-dashboard', function () {
-    $clientesCount = Cliente::count();
-    $habitacionesDisponibles = Habitacion::where('estado', 'disponible')->count();
-    $reservasActivas = Reserva::where('estado', 'activa')->count();
+    $totales = Habitacion::count();
+    $disponibles = Habitacion::where('estado', 'disponible')->count();
+    $activas = Habitacion::where('estado', 'ocupada')->count();
+    $mantenimiento = Habitacion::where('estado', 'mantenimiento')->count();
     $ultimasReservas = Reserva::with('cliente')->orderBy('id_reserva', 'desc')->take(5)->get();
 
-    return view('admin.welcome', compact('clientesCount', 'habitacionesDisponibles', 'reservasActivas', 'ultimasReservas'));
+    return view('admin.welcome', compact('totales', 'disponibles', 'activas', 'mantenimiento', 'ultimasReservas'));
 })->name('admin.dashboard');
 
 Route::get('/admin/reservas', [App\Http\Controllers\AdminReservaController::class, 'index'])->name('admin.reservas');
@@ -34,8 +35,13 @@ Route::get('/login', function () {
     return view('login');
 });
 
-Route::get('/recepcionista-dashboard', function () {
-    return view('recepcionista.dashboard_recepcionista');
+// Dashboard y módulos de Recepcionista
+Route::get('/recepcionista-dashboard', [App\Http\Controllers\RecepcionistaDashboardController::class, 'index'])->name('recepcionista.dashboard');
+
+Route::prefix('recepcionista')->group(function () {
+    Route::get('/reservas', function() { return view('recepcionista.reservas'); })->name('recepcionista.reservas');
+    Route::get('/habitaciones', function() { return view('recepcionista.habitaciones'); })->name('recepcionista.habitaciones');
+    Route::get('/servicios', [App\Http\Controllers\ServicioConsumoController::class, 'index'])->name('recepcionista.servicios');
 });
 
 Route::get('/cliente-dashboard', function () {

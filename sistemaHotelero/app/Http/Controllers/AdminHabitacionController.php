@@ -108,9 +108,9 @@ class AdminHabitacionController extends Controller
             $habitacion = Habitacion::findOrFail($id);
 
             $request->validate([
-                'numero_habitacion' => 'required|max:10|unique:habitaciones,numero_habitacion,' . $habitacion->id_habitacion . ',id_habitacion',
-                'id_tipo' => 'required|exists:tipos_habitacion,id_tipo',
-                'estado' => 'required|in:disponible,ocupada,mantenimiento',
+                'numero_habitacion' => 'sometimes|required|max:10|unique:habitaciones,numero_habitacion,' . $habitacion->id_habitacion . ',id_habitacion',
+                'id_tipo' => 'sometimes|required|exists:tipos_habitacion,id_tipo',
+                'estado' => 'sometimes|required|in:disponible,ocupada,mantenimiento',
             ]);
 
             $habitacion->update($request->all());
