@@ -20,6 +20,12 @@ class RecepcionistaApiController extends Controller
                 'disponibles' => Habitacion::where('estado', 'disponible')->count(),
                 'ocupadas' => Habitacion::where('estado', 'ocupada')->count(),
                 'mantenimiento' => Habitacion::where('estado', 'mantenimiento')->count(),
+            ],
+            'reservas_stats' => [
+                'pendientes' => Reserva::where('estado', 'pendiente')->count(),
+                'activas' => Reserva::where('estado', 'activa')->count(),
+                'finalizadas' => Reserva::where('estado', 'finalizada')->count(),
+                'canceladas' => Reserva::where('estado', 'cancelada')->count(),
             ]
         ]);
     }

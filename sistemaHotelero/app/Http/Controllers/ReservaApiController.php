@@ -11,6 +11,25 @@ class ReservaApiController extends Controller
 
     public function index(Request $request)
     {
+        // AUTO-ACTIVACIÓN: Sincronizar estados antes de listar
+        // 1. Activar reservas pendientes que inician hoy o antes
+        DB::table('reservas')
+            ->where('estado', 'pendiente')
+            ->whereIn('id_reserva', function($q) {
+                $q->select('id_reserva')->from('detalle_reservas')->where('fecha_inicio', '<=', date('Y-m-d'));
+            })
+            ->update(['estado' => 'activa']);
+
+        // 2. Asegurar que las habitaciones de reservas activas estén ocupadas
+        DB::table('habitaciones')
+            ->whereIn('id_habitacion', function($q) {
+                $q->select('dr.id_habitacion')
+                  ->from('detalle_reservas as dr')
+                  ->join('reservas as r', 'dr.id_reserva', '=', 'r.id_reserva')
+                  ->where('r.estado', 'activa');
+            })
+            ->update(['estado' => 'ocupada']);
+
         $query = DB::table('vw_reservas');
 
         if ($request->has('estado') && $request->estado != '') {

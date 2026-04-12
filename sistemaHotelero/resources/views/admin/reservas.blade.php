@@ -207,6 +207,22 @@
 </div>
 @endsection
 
+<!-- Overlay de Simulación de Pago -->
+<div id="paymentOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center;">
+    <div style="background: rgba(255,255,255,0.1); padding: 3rem; border-radius: 24px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 20px 50px rgba(0,0,0,0.3); max-width: 400px; width: 90%;">
+        <div id="paymentIcon" style="margin-bottom: 1.5rem;">
+            <svg class="animate-spin" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto; color: var(--primary);"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"></path></svg>
+        </div>
+        <h2 id="paymentStatusTitle" style="margin-bottom: 1rem; font-size: 1.5rem;">Procesando Pago</h2>
+        <p id="paymentStatusMsg" style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Validando transacción con servidor externo...</p>
+    </div>
+</div>
+
+<style>
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .animate-spin { animation: spin 1s linear infinite; }
+</style>
+
 @section('scripts')
 <script src="{{ asset('js/adminReservas.js') }}"></script>
 @endsection

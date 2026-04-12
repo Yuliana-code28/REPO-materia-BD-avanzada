@@ -16,8 +16,19 @@
         Cargando estadísticas...
     </div>
 </div>
+
+<div style="margin-top: 2rem; display: grid; grid-template-columns: 1fr; gap: 2rem;">
+    <section class="glass-panel" style="padding: 2rem;">
+        <h2 class="panel-header">Distribución de Reservas</h2>
+        <div style="height: 300px; display: flex; justify-content: center; align-items: center;">
+            <canvas id="reservasChart"></canvas>
+        </div>
+    </section>
+</div>
+
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ asset('js/dashboardRecepcionista.js') }}"></script>
 @endsection

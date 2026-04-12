@@ -3,18 +3,57 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function cargarDashboard() {
-    const statsContainer = document.getElementById('statsContainer');
-    const checkinsContainer = document.getElementById('checkinsTableBody');
-    const checkoutsContainer = document.getElementById('checkoutsTableBody');
-
     try {
         const res = await fetch('/api/recepcionista/dashboard-data');
         const data = await res.json();
 
         renderStats(data.stats);
+        renderReservasChart(data.reservas_stats);
     } catch (error) {
         console.error("Error al cargar dashboard:", error);
     }
+}
+
+function renderReservasChart(stats) {
+    const ctx = document.getElementById('reservasChart');
+    if (!ctx) return;
+
+    // Colores premium
+    const colors = {
+        violet: '#8b5cf6',
+        emerald: '#10b981',
+        amber: '#f59e0b',
+        slate: '#64748b'
+    };
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Pendientes', 'Activas', 'Finalizadas', 'Canceladas'],
+            datasets: [{
+                data: [stats.pendientes, stats.activas, stats.finalizadas, stats.canceladas],
+                backgroundColor: [colors.amber, colors.emerald, colors.violet, colors.slate],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: '#1e293b', // Color oscuro para visibilidad en fondo claro
+                        font: { family: 'Inter', size: 12 },
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
 }
 
 function renderStats(stats) {

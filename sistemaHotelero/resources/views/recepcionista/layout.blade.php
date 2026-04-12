@@ -9,6 +9,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <!-- Main CSS -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-light: #ddd6fe;
+        }
+        .sidebar { background: #1e1b4b; }
+        .brand span { color: white; }
+        .nav-item.active { background: rgba(139, 92, 246, 0.1) !important; color: var(--primary) !important; }
+        .nav-item:hover:not(.active) { background: rgba(255,255,255,0.05); }
+    </style>
     @yield('styles')
 </head>
 <body>
@@ -17,7 +27,7 @@
     <aside class="sidebar">
         <div class="brand">
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--primary);"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-            <span style="letter-spacing: -0.025em;">Hotel <span style="color: var(--primary);">LUX</span></span>
+            <span style="letter-spacing: -0.025em; font-weight: 600;">Hotel <span style="color: var(--primary);">LUX</span></span>
         </div>
         <nav class="nav">
             <a href="/recepcionista-dashboard" class="nav-item {{ Request::is('recepcionista-dashboard') ? 'active' : '' }}">

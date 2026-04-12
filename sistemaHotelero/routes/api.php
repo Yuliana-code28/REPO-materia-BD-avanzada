@@ -48,3 +48,14 @@ Route::get('/admin/roles', [EmpleadoApiController::class, 'roles']);
 Route::post('/admin/empleados', [EmpleadoApiController::class, 'store']);
 Route::put('/admin/empleados/{id}', [EmpleadoApiController::class, 'update']);
 Route::delete('/admin/empleados/{id}', [EmpleadoApiController::class, 'destroy']);
+
+// Rutas de Cliente
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/cliente/dashboard-summary', [App\Http\Controllers\ClienteApiController::class, 'getDashboardSummary']);
+    Route::get('/cliente/reservas', [App\Http\Controllers\ClienteApiController::class, 'getReservas']);
+    
+    // Rutas para que el cliente haga su propia reserva
+    Route::get('/cliente/reservas/disponibilidad', [ReservaApiController::class, 'apiDisponibilidad']);
+    Route::get('/cliente/reservas/calcular-costo', [ReservaApiController::class, 'calcularCosto']);
+    Route::post('/cliente/reservas', [App\Http\Controllers\ClienteApiController::class, 'storePropiaReserva']);
+});

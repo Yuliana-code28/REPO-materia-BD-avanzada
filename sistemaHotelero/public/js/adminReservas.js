@@ -17,7 +17,6 @@ async function obtenerReservas(estado = '') {
     }
 }
 
-
 function renderizarTabla(datos) {
     const tbody = document.getElementById('reservasTableBody');
     if (!tbody) return;
@@ -57,17 +56,45 @@ function renderizarTabla(datos) {
                             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
                             Finalizar
                         </button>
+                    ` : ''}
+                    ${reserva.estado === 'activa' || reserva.estado === 'pendiente' ? `
                         <button class="action-badge" onclick="confirmarCancelacion(${reserva.id_reserva})" style="background: rgba(245, 158, 11, 0.05); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
                             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
                             Cancelar
                         </button>
-                    ` : '<span style="color: var(--text-muted); font-size: 0.8rem;">Sin acciones</span>'}
+                    ` : ''}
+                    ${reserva.estado !== 'activa' && reserva.estado !== 'pendiente' ? '<span style="color: var(--text-muted); font-size: 0.8rem;">Sin acciones</span>' : ''}
                 </div>
             </td>
         </tr>
     `).join('');
 }
 
+async function iniciarSimulacionPago(metodo) {
+    const overlay = document.getElementById('paymentOverlay');
+    const title = document.getElementById('paymentStatusTitle');
+    const msg = document.getElementById('paymentStatusMsg');
+    const icon = document.getElementById('paymentIcon');
+
+    if (!overlay) return true;
+
+    overlay.style.display = 'flex';
+    title.innerText = 'Procesando Pago';
+    msg.innerText = `Conectando con pasarela de ${metodo.replace('_', ' ')}...`;
+    icon.innerHTML = `<svg class="animate-spin" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto; color: #8b5cf6;"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"></path></svg>`;
+
+    await new Promise(r => setTimeout(r, 2000));
+    msg.innerText = 'Verificando fondos y autorización...';
+    
+    await new Promise(r => setTimeout(r, 1500));
+    title.innerText = 'Pago Autorizado';
+    msg.innerText = 'Transacción completada con éxito.';
+    icon.innerHTML = `<svg width="50" height="50" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24" style="margin: 0 auto;"><path d="M5 13l4 4L19 7"></path></svg>`;
+
+    await new Promise(r => setTimeout(r, 1000));
+    overlay.style.display = 'none';
+    return true;
+}
 
 async function confirmarFinalizacion(id) {
     if (confirm('¿Deseas marcar esta reservación como FINALIZADA? Esto liberará la habitación inmediatamente.')) {
@@ -79,9 +106,7 @@ async function confirmarFinalizacion(id) {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
                 }
             });
-
             const resultado = await respuesta.json();
-
             if (resultado.success) {
                 alert(resultado.message);
                 const filtroActivo = document.querySelector('.filter-btn.active')?.dataset.estado || '';
@@ -99,7 +124,6 @@ async function confirmarFinalizacion(id) {
 async function confirmarCancelacion(id) {
     if (confirm('¿Estás seguro de que deseas cancelar esta reservación? Esta acción liberará la habitación automáticamente.')) {
         try {
-           
             const respuesta = await fetch(`/api/admin/reservas/${id}/cancelar`, {
                 method: 'PATCH',
                 headers: {
@@ -107,9 +131,7 @@ async function confirmarCancelacion(id) {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
                 }
             });
-
             const resultado = await respuesta.json();
-
             if (resultado.success) {
                 alert(resultado.message);
                 const filtroActivo = document.querySelector('.filter-btn.active')?.dataset.estado || '';
@@ -124,7 +146,6 @@ async function confirmarCancelacion(id) {
     }
 }
 
-
 function formatearFecha(cadenaFecha) {
     if (!cadenaFecha) return 'N/A';
     const fecha = new Date(cadenaFecha);
@@ -134,10 +155,7 @@ function formatearFecha(cadenaFecha) {
     return `${dia}/${mes}/${anio}`;
 }
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
-    // Carga inicial
     obtenerReservas();
     cargarDatosFormularioModal();
 
@@ -145,24 +163,16 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const res = await fetch('/api/admin/reservas/form-data');
             const data = await res.json();
-
             const selectCliente = document.getElementById('id_cliente');
             if (selectCliente && data.clientes) {
                 selectCliente.innerHTML = '<option value="">Seleccione un cliente...</option>' + 
                     data.clientes.map(c => `<option value="${c.id_cliente}">${c.nombre} ${c.ap} (${c.email})</option>`).join('');
             }
-
-            // Nota: El selector de habitaciones ya no se carga aquí, 
-            // sino dinámicamente en actualizarDisponibilidadHabitaciones()
-
         } catch (error) {
             console.error('Error al cargar datos del formulario:', error);
-            const selectCliente = document.getElementById('id_cliente');
-            if (selectCliente) selectCliente.innerHTML = '<option value="">Error al cargar clientes</option>';
         }
     }
 
-    // Filtros
     document.querySelectorAll('.filter-btn').forEach(boton => {
         boton.addEventListener('click', function() {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -171,7 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Búsqueda en el cliente
     const entradaBusqueda = document.getElementById('searchReserva');
     if (entradaBusqueda) {
         entradaBusqueda.addEventListener('keyup', function() {
@@ -185,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Cálculo automático de costo
     async function calcularCosto() {
         const idHabitacionInput = document.getElementById('id_habitacion');
         const fechaInicioInput = document.getElementById('fecha_inicio');
@@ -193,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const montoPagoInput = document.getElementById('monto_pago');
 
         if (!idHabitacionInput || !fechaInicioInput || !fechaFinInput || !montoPagoInput) return;
-
         const id_habitacion = idHabitacionInput.value;
         const fecha_inicio = fechaInicioInput.value;
         const fecha_fin = fechaFinInput.value;
@@ -207,7 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
             montoPagoInput.value = 'Calculando...';
             const res = await fetch(`/api/admin/reservas/calcular-costo?id_habitacion=${id_habitacion}&fecha_inicio=${fecha_inicio}&fecha_fin=${fecha_fin}`);
             const data = await res.json();
-            
             if (data.success && data.costo !== null) {
                 montoPagoInput.value = parseFloat(data.costo).toFixed(2);
             } else {
@@ -215,147 +221,81 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error calculando costo:', error);
-            montoPagoInput.value = '';
         }
     }
 
-    // Filtrado de disponibilidad por fechas
     async function actualizarDisponibilidadHabitaciones() {
         const fechaInicio = document.getElementById('fecha_inicio').value;
         const fechaFin = document.getElementById('fecha_fin').value;
         const selectHab = document.getElementById('id_habitacion');
-
-        if (!fechaInicio || !fechaFin || !selectHab) {
-            if(selectHab) {
-                selectHab.disabled = true;
-                selectHab.innerHTML = '<option value="">Seleccione primero las fechas...</option>';
-            }
-            return;
-        }
-
-        // Validar que la fecha fin sea después del inicio antes de consultar
-        if (new Date(fechaFin) <= new Date(fechaInicio)) {
-            selectHab.disabled = true;
-            selectHab.innerHTML = '<option value="">La fecha fin debe ser mayor al inicio</option>';
-            return;
-        }
+        if (!fechaInicio || !fechaFin || !selectHab) return;
 
         try {
             selectHab.disabled = true;
             selectHab.innerHTML = '<option value="">Consultando disponibilidad...</option>';
-            
             const res = await fetch(`/api/admin/reservas/disponibilidad?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`);
             const habitaciones = await res.json();
-
             if (habitaciones.length === 0) {
-                selectHab.innerHTML = '<option value="">No hay habitaciones disponibles para estas fechas</option>';
-                selectHab.disabled = true;
+                selectHab.innerHTML = '<option value="">No hay habitaciones disponibles</option>';
             } else {
-                selectHab.innerHTML = '<option value="" data-precio="0">Seleccione una habitación disponible...</option>' + 
-                    habitaciones.map(h => {
-                        return `<option value="${h.id_habitacion}" data-precio="${h.precio_base}">Hab. ${h.numero_habitacion} - ${h.nombre_tipo} ($${parseFloat(h.precio_base).toFixed(2)}/noche)</option>`;
-                    }).join('');
+                selectHab.innerHTML = '<option value="">Seleccione una habitación...</option>' + 
+                    habitaciones.map(h => `<option value="${h.id_habitacion}" data-precio="${h.precio_base}">Hab. ${h.numero_habitacion} - ${h.nombre_tipo}</option>`).join('');
                 selectHab.disabled = false;
             }
-            
-            // Si la habitación que estaba seleccionada ya no está disponible, limpiar el costo
-            document.getElementById('monto_pago').value = '';
-
         } catch (error) {
-            console.error('Error al actualizar disponibilidad:', error);
-            selectHab.innerHTML = '<option value="">Error al cargar disponibilidad</option>';
-            selectHab.disabled = true;
+            console.error('Error:', error);
         }
     }
 
     const inputHabitacion = document.getElementById('id_habitacion');
     const inputFechaInicio = document.getElementById('fecha_inicio');
     const inputFechaFin = document.getElementById('fecha_fin');
-
     if (inputHabitacion) inputHabitacion.addEventListener('change', calcularCosto);
-    
-    if (inputFechaInicio) {
-        inputFechaInicio.addEventListener('change', () => {
-            actualizarDisponibilidadHabitaciones();
-            calcularCosto();
-        });
-    }
-    
-    if (inputFechaFin) {
-        inputFechaFin.addEventListener('change', () => {
-            actualizarDisponibilidadHabitaciones();
-            calcularCosto();
-        });
-    }
+    if (inputFechaInicio) inputFechaInicio.addEventListener('change', () => { actualizarDisponibilidadHabitaciones(); calcularCosto(); });
+    if (inputFechaFin) inputFechaFin.addEventListener('change', () => { actualizarDisponibilidadHabitaciones(); calcularCosto(); });
 
-    // Creación de reserva
     const formCrear = document.getElementById('createReservaForm');
     if (formCrear) {
         formCrear.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());
+            const metodo_pago = data.metodo_pago;
+
+            if (metodo_pago && metodo_pago !== 'efectivo') {
+                const simulacionExitosa = await iniciarSimulacionPago(metodo_pago);
+                if (!simulacionExitosa) return;
+            }
 
             try {
                 const button = this.querySelector('button[type="submit"]');
-                const originalText = button.innerHTML;
                 button.innerHTML = 'Guardando...';
                 button.disabled = true;
 
                 const respuesta = await fetch('/api/admin/reservas', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-                    },
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') },
                     body: JSON.stringify(data)
                 });
-
                 const resultado = await respuesta.json();
-
-                button.innerHTML = originalText;
+                button.innerHTML = 'Guardar Reserva';
                 button.disabled = false;
 
                 if (resultado.success) {
                     alert(resultado.message);
                     closeModal('createModal');
                     this.reset();
-                    
-                    // Recargar tabla
-                    const filtroActivo = document.querySelector('.filter-btn.active')?.dataset.estado || '';
-                    obtenerReservas(filtroActivo);
-                    
-                    // Opcionalmente recargar todo si es que las habitaciones en el combo deben rehidratarse:
-                    setTimeout(() => window.location.reload(), 1500); // Reload para que se actualice la lista de despues
+                    obtenerReservas();
                 } else {
-                    alert('Error: ' + (resultado.message || 'Datos inválidos.'));
+                    alert('Error: ' + resultado.message);
                 }
             } catch (error) {
-                console.error('Error al enviar:', error);
-                alert('Ocurrió un error al guardar la reservación.');
-                
-                const button = this.querySelector('button[type="submit"]');
-                button.innerHTML = 'Guardar Reserva';
-                button.disabled = false;
+                console.error('Error:', error);
             }
         });
     }
 });
 
-function openModal(id) {
-    document.getElementById(id).style.display = 'block';
-    document.body.style.overflow = 'hidden';
-}
-
-function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
-    document.body.style.overflow = 'auto';
-}
-
-window.onclick = function(event) {
-    if (event.target.classList.contains('modal')) {
-        event.target.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-}
+function openModal(id) { document.getElementById(id).style.display = 'block'; document.body.style.overflow = 'hidden'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; document.body.style.overflow = 'auto'; }
+window.onclick = function(event) { if (event.target.classList.contains('modal')) closeModal(event.target.id); }
