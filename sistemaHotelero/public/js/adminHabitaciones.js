@@ -13,7 +13,7 @@ async function obtenerHabitaciones(estado = '') {
         renderizarTabla(habitacionesActuales);
     } catch (error) {
         console.error('Error al obtener habitaciones:', error);
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--warning); padding: 2rem;">Error al cargar los datos.</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--warning); padding: 2rem;">Error al cargar los datos: ${error.message} - ${error.stack}</td></tr>`;
     }
 }
 
