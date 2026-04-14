@@ -295,7 +295,8 @@ DELIMITER //
 
 -- Función: Calcular Costo de Estancia
 -- Descripción: Calcula el costo base de la habitación multiplicado por los días de estancia.
--- ya utlizada
+-- Problema que resuelve: Permite obtener de forma dinámica y calculada el cobro correcto por cada reserva evitando discrepancias.
+-- ya utilizada
 CREATE FUNCTION fn_costo_estancia(p_id_reserva INT) 
 RETURNS DECIMAL(10,2)
 DETERMINISTIC
@@ -314,6 +315,7 @@ END //
 
 -- Función: Calcular Costo Proyectado
 -- Descripción: Calcula el costo de una estancia antes de que se cree la reserva oficial.
+-- Problema que resuelve: Permite cotizar a los clientes cuánto costaría su reserva hipotética antes de registrarla en la BD.
 CREATE FUNCTION fn_calcular_costo_proyectado(p_id_habitacion INT, p_fecha_inicio DATE, p_fecha_fin DATE)
 RETURNS DECIMAL(10,2)
 DETERMINISTIC
@@ -333,7 +335,8 @@ END //
 
 -- Función: Total Reservas Cliente
 -- Descripción: Retorna el número total de reservas realizadas por un cliente específico.
---ya ulizada
+-- Problema que resuelve: Facilita identificar el nivel de actividad de cada usuario para categorizarlos.
+-- ya utlizada
 CREATE FUNCTION fn_total_reservas_cliente(p_id_cliente INT) 
 RETURNS INT
 DETERMINISTIC

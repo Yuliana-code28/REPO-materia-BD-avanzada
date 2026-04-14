@@ -31,13 +31,14 @@ SELECT cliente, total_pagado
 FROM vw_historial_clientes
 WHERE total_pagado > (SELECT AVG(monto) FROM pagos);
 
--- 4. Ingresos por periodo (Mensuales)
--- Objetivo: Reportar el total de dinero ingresado agrupado por mes.
+-- 4. Ingresos por periodo (Mensuales con ingresos superiores a $5,000)
+-- Objetivo: Reportar el total de dinero ingresado agrupado por mes, filtrando solo los meses de altas ganancias mediante HAVING.
 SELECT 
     DATE_FORMAT(fecha_pago, '%Y-%m') AS periodo,
     SUM(monto) AS ingresos_totales
 FROM pagos
 GROUP BY periodo
+HAVING ingresos_totales > 5000
 ORDER BY periodo DESC;
 
 -- 5. Mostrar reservas activas con cliente y habitación (JOIN)
@@ -84,3 +85,16 @@ LEFT JOIN detalle_reservas dr ON h.id_habitacion = dr.id_habitacion
 LEFT JOIN reservas r ON dr.id_reserva = r.id_reserva
 LEFT JOIN clientes c ON r.id_cliente = c.id_cliente
 WHERE CURDATE() BETWEEN dr.fecha_inicio AND dr.fecha_fin;
+
+-- 9. Consultar cotización de nueva reserva (Uso de función fn_calcular_costo_proyectado)
+-- Objetivo: Mostrar cuánto costaría hospedar a un cliente en la habitación 10 (cabaña familiar) por 5 días.
+-- Esta consulta demuestra el uso obligatorio de todas las funciones según la rúbrica.
+SELECT 
+    h.numero_habitacion,
+    th.nombre_tipo,
+    CURDATE() + INTERVAL 7 DAY AS fecha_inicio_proyectada,
+    CURDATE() + INTERVAL 12 DAY AS fecha_fin_proyectada,
+    fn_calcular_costo_proyectado(h.id_habitacion, CURDATE() + INTERVAL 7 DAY, CURDATE() + INTERVAL 12 DAY) AS costo_estimado
+FROM habitaciones h
+JOIN tipos_habitacion th ON h.id_tipo = th.id_tipo
+WHERE h.id_habitacion = 10;
