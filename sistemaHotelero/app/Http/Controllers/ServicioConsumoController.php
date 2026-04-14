@@ -9,12 +9,12 @@ use Illuminate\Support\Facades\DB;
 
 class ServicioConsumoController extends Controller
 {
-    public function index()
+    public function mostrarVistaServicios()
     {
         return view('recepcionista.servicios');
     }
 
-    public function getActiveReservations()
+    public function obtenerReservasActivas()
     {
         // Solo habitaciones ocupadas (activas)
         $reservas = Reserva::where('estado', 'activa')
@@ -23,12 +23,12 @@ class ServicioConsumoController extends Controller
         return response()->json($reservas);
     }
 
-    public function getServices()
+    public function listarServiciosDisponibles()
     {
         return response()->json(Servicio::all());
     }
 
-    public function store(Request $request)
+    public function registrarConsumoServicio(Request $request)
     {
         $request->validate([
             'id_reserva' => 'required|exists:reservas,id_reserva',

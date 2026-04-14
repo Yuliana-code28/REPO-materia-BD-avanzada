@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class AdminHabitacionController extends Controller
 {
-    public function index(Request $request)
+    public function mostrarVistaHabitaciones(Request $request)
     {
         $query = Habitacion::with('tipo');
         
@@ -23,7 +23,7 @@ class AdminHabitacionController extends Controller
         return view('admin.habitaciones', compact('habitaciones', 'tipos'));
     }
 
-    public function formData()
+    public function obtenerTiposHabitacion()
     {
         try {
             $tipos = TipoHabitacion::all();
@@ -33,16 +33,47 @@ class AdminHabitacionController extends Controller
         }
     }
 
-    public function apiIndex(Request $request)
+    public function listarHabitacionesAPI(Request $request)
     {
-        $query = Habitacion::with('tipo');
+        // Consulta #8: Obtener habitaciones con información de ocupación actual
+        // Se usa una subconsulta para evitar errores si la Vista SQL aún no ha sido creada en la BD.
+        $subqueryOcupacion = "
+            SELECT 
+                h_sub.id_habitacion,
+                dr_sub.fecha_inicio,
+                dr_sub.fecha_fin,
+                CONCAT(c_sub.nombre, ' ', c_sub.ap) AS ocupante
+            FROM habitaciones h_sub
+            INNER JOIN detalle_reservas dr_sub ON h_sub.id_habitacion = dr_sub.id_habitacion
+            INNER JOIN reservas r_sub ON dr_sub.id_reserva = r_sub.id_reserva
+            INNER JOIN clientes c_sub ON r_sub.id_cliente = c_sub.id_cliente
+            WHERE (CURDATE() BETWEEN dr_sub.fecha_inicio AND dr_sub.fecha_fin)
+              AND r_sub.estado = 'activa'
+        ";
+
+        $query = DB::table('habitaciones as h')
+            ->select('h.*', 'th.nombre_tipo', 'th.precio_base', 'oa.ocupante', 'oa.fecha_inicio', 'oa.fecha_fin')
+            ->join('tipos_habitacion as th', 'h.id_tipo', '=', 'th.id_tipo')
+            ->leftJoin(DB::raw("($subqueryOcupacion) as oa"), 'h.id_habitacion', '=', 'oa.id_habitacion');
+
         if ($request->has('estado') && $request->estado != '') {
-            $query->where('estado', $request->estado);
+            $query->where('h.estado', $request->estado);
         }
-        return response()->json($query->orderBy('numero_habitacion', 'asc')->get());
+
+        $habitaciones = $query->orderBy('h.numero_habitacion', 'asc')->get();
+
+        // Estructurar para mantener compatibilidad con el front (anidar tipo)
+        foreach ($habitaciones as $h) {
+            $h->tipo = (object)[
+                'nombre_tipo' => $h->nombre_tipo,
+                'precio_base' => $h->precio_base
+            ];
+        }
+
+        return response()->json($habitaciones);
     }
 
-    public function store(Request $request)
+    public function guardarHabitacionWeb(Request $request)
     {
         $request->validate([
             'numero_habitacion' => 'required|unique:habitaciones,numero_habitacion|max:10',
@@ -55,7 +86,7 @@ class AdminHabitacionController extends Controller
         return redirect()->route('admin.habitaciones')->with('success', 'Habitación creada correctamente.');
     }
 
-    public function update(Request $request, $id)
+    public function actualizarHabitacionWeb(Request $request, $id)
     {
         $habitacion = Habitacion::findOrFail($id);
 
@@ -70,7 +101,7 @@ class AdminHabitacionController extends Controller
         return redirect()->route('admin.habitaciones')->with('success', 'Habitación actualizada correctamente.');
     }
 
-    public function destroy($id)
+    public function eliminarHabitacionWeb($id)
     {
         $habitacion = Habitacion::findOrFail($id);
 
@@ -85,7 +116,7 @@ class AdminHabitacionController extends Controller
 
         return redirect()->route('admin.habitaciones')->with('success', 'Habitación eliminada correctamente.');
     }
-    public function apiStore(Request $request)
+    public function crearHabitacionAPI(Request $request)
     {
         try {
             $request->validate([
@@ -102,7 +133,7 @@ class AdminHabitacionController extends Controller
         }
     }
 
-    public function apiUpdate(Request $request, $id)
+    public function actualizarHabitacionAPI(Request $request, $id)
     {
         try {
             $habitacion = Habitacion::findOrFail($id);
@@ -121,7 +152,7 @@ class AdminHabitacionController extends Controller
         }
     }
 
-    public function apiDestroy($id)
+    public function eliminarHabitacionAPI($id)
     {
         try {
             $habitacion = Habitacion::findOrFail($id);

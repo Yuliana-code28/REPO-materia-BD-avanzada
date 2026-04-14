@@ -101,6 +101,8 @@
         border: none;
         background: none;
     }
+
+    }
 </style>
 @endsection
 
@@ -119,6 +121,7 @@
 <div class="filter-container" id="filterContainer">
     <button class="filter-btn active" data-estado="">Todas</button>
     <button class="filter-btn" data-estado="activa">Activas</button>
+    <button class="filter-btn" data-estado="pendiente">Pendientes</button>
     <button class="filter-btn" data-estado="finalizada">Finalizadas</button>
     <button class="filter-btn" data-estado="cancelada">Canceladas</button>
 </div>

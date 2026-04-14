@@ -10,6 +10,7 @@ async function obtenerReservas(estado = '') {
         const url = estado ? `/api/admin/reservas?estado=${estado}` : '/api/admin/reservas';
         const respuesta = await fetch(url);
         reservasActuales = await respuesta.json();
+        
         renderizarTabla(reservasActuales);
     } catch (error) {
         console.error('Error al obtener reservaciones:', error);
@@ -42,9 +43,7 @@ function renderizarTabla(datos) {
                 </div>
             </td>
             <td>
-                <span class="status-badge badge-${reserva.estado.toLowerCase()}">
-                    ${reserva.estado}
-                </span>
+                <span class="status-badge badge-${reserva.estado.toLowerCase()}">${reserva.estado.charAt(0).toUpperCase() + reserva.estado.slice(1)}</span>
             </td>
             <td style="font-weight: 600;">
                 $${parseFloat(reserva.costo_total).toLocaleString('en-US', {minimumFractionDigits: 2})}

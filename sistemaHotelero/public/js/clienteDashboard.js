@@ -28,7 +28,7 @@ async function cargarDatosDashboard() {
 
 function renderizarResumen(data) {
     document.getElementById('statTotalReservas').textContent = data.totalReservas || 0;
-    document.getElementById('statTotalInvertido').textContent = `$${parseFloat(data.totalGastado || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    document.getElementById('statTotalInvertido').textContent = `$${parseFloat(data.totalGastado || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 
     // Info personal
     const user = JSON.parse(localStorage.getItem('user'));
@@ -50,8 +50,12 @@ function renderizarResumen(data) {
         return;
     }
 
-    const estadoTexto = reserva.estado === 'activa' ? 'Estancia Actual' : 'Próxima Llegada';
-    const colorEstado = reserva.estado === 'activa' ? 'var(--success)' : 'var(--primary)';
+    let estadoTexto = reserva.estado === 'activa' ? 'Estancia Actual' : 'Pendiente';
+    let colorEstado = reserva.estado === 'activa' ? 'var(--success)' : 'var(--primary)';
+
+    if (reserva.estado === 'finalizada') {
+        colorEstado = 'var(--text-muted)';
+    }
 
     container.innerHTML = `
         <div style="width: 100%;">
@@ -69,7 +73,7 @@ function renderizarResumen(data) {
                 ${reserva.estado === 'activa' ? `
                     <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border); display: flex; justify-content: space-between; font-size: 0.85rem;">
                         <span style="color: var(--text-muted);">Costo Estadía:</span>
-                        <span style="font-weight: 600;">$${parseFloat(reserva.pagos?.[0]?.monto || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                        <span style="font-weight: 600;">$${parseFloat(reserva.pagos?.[0]?.monto || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                     </div>
                 ` : ''}
             </div>
@@ -104,7 +108,7 @@ function renderizarConsumos(consumos, total) {
     `).join('');
 
     totalCont.style.display = 'block';
-    labelTotal.textContent = `$${parseFloat(total).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    labelTotal.textContent = `$${parseFloat(total).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 }
 
 async function cargarHistorial() {
@@ -136,7 +140,7 @@ function renderizarHistorial(reservas) {
             <td>
                 <span class="status-badge badge-${res.estado.toLowerCase()}">${res.estado}</span>
             </td>
-            <td style="font-weight: 600;">$${parseFloat(res.pagos?.[0]?.monto || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="font-weight: 600;">$${parseFloat(res.pagos?.[0]?.monto || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
         </tr>
     `).join('');
 }

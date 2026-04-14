@@ -2,6 +2,12 @@
 
 @section('title', 'Mi Dashboard')
 
+@section('styles')
+<style>
+    }
+</style>
+@endsection
+
 @section('content')
 <header>
     <div>

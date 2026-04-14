@@ -1,8 +1,5 @@
--- ==========================================================
--- PRUEBAS DE SEGURIDAD (ROLES Y PERMISOS)
--- ==========================================================
--- Este script cumple con la indicación: 
--- "Todos los roles deben ser probados con ejemplos de acceso permitido y denegado"
+
+-- Todos los roles deben ser probados con ejemplos de acceso permitido y denegado
 
 USE sistemahotelero;
 
@@ -82,6 +79,3 @@ FLUSH PRIVILEGES;
 REVOKE SELECT ON sistemahotelero.habitaciones FROM 'cliente_user'@'localhost';
 FLUSH PRIVILEGES;
 
--- ACCESO DENEGADO TRAS REVOKE:
--- SESSION 'cliente_user'> SELECT * FROM habitaciones;
--- SALIDA ESPERADA: ERROR 1142 (42000): SELECT command denied to user 'cliente_user'@'localhost' for table 'habitaciones'

@@ -7,12 +7,12 @@ use Illuminate\Support\Facades\DB;
 
 class AdminClienteController extends Controller
 {
-    public function index()
+    public function mostrarVistaClientes()
     {
         return view('admin.clientes');
     }
 
-    public function apiIndex(Request $request)
+    public function listarClientesAPI(Request $request)
     {
         // 1. Uso de Vista + CASE para clasificación
         $clientesSQL = "
@@ -35,7 +35,7 @@ class AdminClienteController extends Controller
         
         $clientes = DB::select($clientesSQL);
 
-        // 2. Uso de Subconsulta para encontrar Mejores Pagadores (Top Payers)
+        // 2. Uso de Subconsulta para encontrar Mejores Pagadores (Top Payers) - Consulta #3
         $topPayersSQL = "
             SELECT id_cliente
             FROM vw_historial_clientes
@@ -44,9 +44,21 @@ class AdminClienteController extends Controller
         $topPayersRaw = DB::select($topPayersSQL);
         $topPayersIds = array_map(function($o){ return $o->id_cliente; }, $topPayersRaw);
 
-        // Mapear validación al arreglo final
+        // 3. Uso de Subconsulta para encontrar Clientes Frecuentes - Consulta #7
+        $frecuentesSQL = "
+            SELECT id_cliente 
+            FROM vw_historial_clientes 
+            WHERE total_reservas > (SELECT AVG(total_reservas) FROM (
+                SELECT fn_total_reservas_cliente(id_cliente) AS total_reservas FROM clientes
+            ) AS sub)
+        ";
+        $frecuentesRaw = DB::select($frecuentesSQL);
+        $frecuentesIds = array_map(function($o){ return $o->id_cliente; }, $frecuentesRaw);
+
+        // Mapear validaciones al arreglo final
         foreach ($clientes as $c) {
             $c->es_top_pagador = in_array($c->id_cliente, $topPayersIds);
+            $c->es_frecuente = in_array($c->id_cliente, $frecuentesIds);
         }
 
         return response()->json($clientes);

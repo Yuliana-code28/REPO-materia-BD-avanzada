@@ -6,12 +6,12 @@ use Illuminate\Http\Request;
 
 class ClienteDashboardController extends Controller
 {
-    public function index()
+    public function mostrarVistaDashboard()
     {
         return view('cliente.dashboard_cliente');
     }
 
-    public function reservas()
+    public function mostrarVistaReservas()
     {
         return view('cliente.reservas');
     }

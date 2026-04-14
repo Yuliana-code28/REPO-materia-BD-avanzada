@@ -38,6 +38,7 @@
                 <th>Tipo</th>
                 <th>Precio Base</th>
                 <th>Estado</th>
+                <th>Ocupante Actual</th>
                 <th>Acciones</th>
             </tr>
         </thead>

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class AdminReservaController extends Controller
 {
-    public function index(Request $request)
+    public function mostrarVistaReservas(Request $request)
     {
         $query = DB::table('vw_reservas');
 

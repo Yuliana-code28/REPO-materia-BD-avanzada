@@ -7,14 +7,14 @@ use Illuminate\Support\Facades\DB;
 
 class AdminFacturacionController extends Controller
 {
-    public function index()
+    public function mostrarVistaFacturacion()
     {
         return view('admin.facturacion');
     }
 
-    public function apiIndex(Request $request)
+    public function listarFacturacionAPI(Request $request)
     {
-        // Consulta avanzada con JOIN para el historial de facturación
+        // Consulta  con JOIN para el historial de facturación
         $pagosSQL = "
             SELECT 
                 p.id_pago,
@@ -33,9 +33,9 @@ class AdminFacturacionController extends Controller
         return response()->json($pagos);
     }
 
-    public function apiReportes()
+    public function obtenerReportesEstadisticosAPI()
     {
-        // 1. Ingresos Mensuales (Consulta #4 del script SQL)
+        // 1. Ingresos Mensuales (Consulta #4) 
         $mensualSQL = "
             SELECT 
                 DATE_FORMAT(fecha_pago, '%Y-%m') AS periodo,
@@ -46,7 +46,7 @@ class AdminFacturacionController extends Controller
             LIMIT 6
         ";
         
-        // 2. Ingresos Anuales (Consulta #6 del script SQL)
+        // 2. Ingresos Anuales (Consulta #6 )
         $anualSQL = "
             SELECT 
                 YEAR(fecha_pago) AS anio,

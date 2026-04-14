@@ -10,7 +10,7 @@ use Carbon\Carbon;
 
 class RecepcionistaDashboardController extends Controller
 {
-    public function index()
+    public function mostrarVistaDashboard()
     {
         $hoy = Carbon::today()->format('Y-m-d');
 

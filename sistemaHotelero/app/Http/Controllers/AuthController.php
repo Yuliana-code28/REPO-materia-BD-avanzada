@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function registro(Request $request) {
+    public function registrarCliente(Request $request) {
         $request->validate([
             'nombre' => 'required|string|max:255',
             'ap' => 'required|string|max:50',
@@ -73,7 +73,7 @@ class AuthController extends Controller
 
 
     
-    public function login(Request $request){
+    public function autenticarUsuario(Request $request){
        
        $request->validate([
             'username' => 'required',
@@ -113,7 +113,7 @@ class AuthController extends Controller
 
     }
 
-    public function olvideMicontrasena(Request $request){
+    public function enviarEnlaceRecuperacion(Request $request){
                 $request->validate(['email' => 'required|email'], [
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.email' => 'El formato del correo electrónico es inválido.'
@@ -150,7 +150,7 @@ class AuthController extends Controller
     }
 
 
-    public function cambiarContrasena(Request $request){
+    public function restablecerContrasena(Request $request){
 
     
           $request->validate([
@@ -192,7 +192,7 @@ class AuthController extends Controller
           return response()->json(['mensaje' => 'Contraseña actualizada']);
         }
 
-        function logout(Request $request){
+        function cerrarSesion(Request $request){
              $request->user()->currentAccessToken()->delete();
 
              return response()->json([

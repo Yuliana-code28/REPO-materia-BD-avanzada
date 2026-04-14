@@ -38,6 +38,7 @@
     .badge-platino { background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3); }
     .badge-estandar { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
     .badge-nuevo { background: rgba(100, 116, 139, 0.15); color: #64748b; border: 1px solid rgba(100, 116, 139, 0.3); }
+    .badge-vip { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
 
     .top-payer-badge {
         font-size: 0.70rem;
@@ -49,6 +50,18 @@
         width: fit-content;
         font-weight: bold;
         box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+    }
+
+    .frecuente-badge {
+        font-size: 0.70rem;
+        padding: 0.15rem 0.4rem;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: #fff;
+        border-radius: 4px;
+        display: inline-block;
+        width: fit-content;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
     }
 
     .search-input {
@@ -75,6 +88,7 @@
     <button class="filter-btn" data-clasificacion="CLIENTE PLATINO">Platinos</button>
     <button class="filter-btn" data-clasificacion="CLIENTE ESTANDAR">Estándar</button>
     <button class="filter-btn" data-clasificacion="TOP_PAYERS">Top Pagadores</button>
+    <button class="filter-btn" data-clasificacion="FRECUENTES">Frecuentes (VIP)</button>
 </div>
 
 <section class="glass-panel">

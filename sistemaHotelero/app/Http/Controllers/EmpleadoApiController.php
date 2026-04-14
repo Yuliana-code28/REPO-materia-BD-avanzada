@@ -11,19 +11,19 @@ use Illuminate\Support\Facades\DB;
 
 class EmpleadoApiController extends Controller
 {
-    public function index()
+    public function listarEmpleados()
     {
         $empleados = Empleados::with(['usuario.rol'])->get();
         return response()->json($empleados);
     }
 
-    public function roles()
+    public function listarRoles()
     {
         $roles = Rol::all();
         return response()->json($roles);
     }
 
-    public function store(Request $request)
+    public function crearEmpleado(Request $request)
     {
         $request->validate([
             'nombre' => 'required|string|max:50',
@@ -62,7 +62,7 @@ class EmpleadoApiController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function actualizarEmpleado(Request $request, $id)
     {
         $empleado = Empleados::findOrFail($id);
         $usuario = Usuarios::where('id_empleado', $id)->first();
@@ -99,7 +99,7 @@ class EmpleadoApiController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function eliminarEmpleado($id)
     {
         try {
             DB::beginTransaction();

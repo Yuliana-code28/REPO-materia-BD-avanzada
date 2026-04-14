@@ -9,24 +9,53 @@ use Illuminate\Validation\ValidationException;
 class ReservaApiController extends Controller
 {
 
-    public function index(Request $request)
+    public function listarReservas(Request $request)
     {
-        // AUTO-ACTIVACIÓN: Sincronizar estados antes de listar
-        // 1. Activar reservas pendientes que inician hoy o antes
+        $hoy = date('Y-m-d');
+
+        // AUTO-SINCRONIZACIÓN:
+
+        // 1. Activar reservas pendientes que inician hoy (y que no han vencido)
         DB::table('reservas')
             ->where('estado', 'pendiente')
-            ->whereIn('id_reserva', function($q) {
-                $q->select('id_reserva')->from('detalle_reservas')->where('fecha_inicio', '<=', date('Y-m-d'));
+            ->whereIn('id_reserva', function ($q) use ($hoy) {
+                $q->select('id_reserva')->from('detalle_reservas')
+                    ->where('fecha_inicio', '<=', $hoy)
+                    ->where('fecha_fin', '>=', $hoy);
             })
             ->update(['estado' => 'activa']);
 
-        // 2. Asegurar que las habitaciones de reservas activas estén ocupadas
+        // 2. Finalizar reservas que ya terminaron (fecha_fin < hoy)
+        DB::table('reservas')
+            ->where('estado', 'activa')
+            ->whereIn('id_reserva', function ($q) use ($hoy) {
+                $q->select('id_reserva')->from('detalle_reservas')
+                    ->where('fecha_fin', '<', $hoy);
+            })
+            ->update(['estado' => 'finalizada']);
+
+        // 3. Liberar habitaciones que ya no tienen reservas activas hoy
         DB::table('habitaciones')
-            ->whereIn('id_habitacion', function($q) {
+            ->where('estado', 'ocupada')
+            ->whereNotIn('id_habitacion', function ($q) use ($hoy) {
                 $q->select('dr.id_habitacion')
-                  ->from('detalle_reservas as dr')
-                  ->join('reservas as r', 'dr.id_reserva', '=', 'r.id_reserva')
-                  ->where('r.estado', 'activa');
+                    ->from('detalle_reservas as dr')
+                    ->join('reservas as r', 'dr.id_reserva', '=', 'r.id_reserva')
+                    ->where('r.estado', 'activa')
+                    ->where('dr.fecha_inicio', '<=', $hoy)
+                    ->where('dr.fecha_fin', '>=', $hoy);
+            })
+            ->update(['estado' => 'disponible']);
+
+        // 4. Asegurar que habitaciones con reservas activas hoy estén como 'ocupada'
+        DB::table('habitaciones')
+            ->whereIn('id_habitacion', function ($q) use ($hoy) {
+                $q->select('dr.id_habitacion')
+                    ->from('detalle_reservas as dr')
+                    ->join('reservas as r', 'dr.id_reserva', '=', 'r.id_reserva')
+                    ->where('r.estado', 'activa')
+                    ->where('dr.fecha_inicio', '<=', $hoy)
+                    ->where('dr.fecha_fin', '>=', $hoy);
             })
             ->update(['estado' => 'ocupada']);
 
@@ -41,7 +70,7 @@ class ReservaApiController extends Controller
         return response()->json($reservas);
     }
 
-    public function formData()
+    public function obtenerDatosFormularioReserva()
     {
         $clientes = \App\Models\Cliente::all();
         $habitaciones = \App\Models\Habitacion::with('tipo')->where('estado', '!=', 'mantenimiento')->get();
@@ -52,7 +81,7 @@ class ReservaApiController extends Controller
         ]);
     }
 
-    public function calcularCosto(Request $request)
+    public function calcularCostoEstancia(Request $request)
     {
         $request->validate([
             'id_habitacion' => 'required|integer',
@@ -62,7 +91,7 @@ class ReservaApiController extends Controller
 
         try {
             $costo = DB::selectOne(
-                'SELECT fn_calcular_costo_proyectado(?, ?, ?) AS costo', 
+                'SELECT fn_calcular_costo_proyectado(?, ?, ?) AS costo',
                 [$request->id_habitacion, $request->fecha_inicio, $request->fecha_fin]
             );
 
@@ -71,14 +100,14 @@ class ReservaApiController extends Controller
                 'costo' => $costo->costo
             ]);
         } catch (\Exception $e) {
-             return response()->json([
+            return response()->json([
                 'success' => false,
                 'message' => 'Error al calcular el costo.'
             ], 500);
         }
     }
 
-    public function apiDisponibilidad(Request $request)
+    public function consultarDisponibilidadHabitaciones(Request $request)
     {
         $request->validate([
             'fecha_inicio' => 'required|date',
@@ -100,7 +129,7 @@ class ReservaApiController extends Controller
         }
     }
 
-    public function store(Request $request)
+    public function registrarNuevaReserva(Request $request)
     {
         try {
             $request->validate([
@@ -133,7 +162,7 @@ class ReservaApiController extends Controller
         } catch (\Exception $e) {
             $errorMsg = 'Ocurrió un error inesperado al procesar la reserva.';
             $rawMsg = $e->getMessage();
-            
+
             // Si es un error arrojado por SIGNAL (código 1644)
             if (strpos($rawMsg, '1644') !== false) {
                 // Extraer el texto a partir del '1644 '
@@ -143,7 +172,7 @@ class ReservaApiController extends Controller
                     $errorMsg = explode(' (Connection:', trim($parts[1]))[0];
                 }
             } else {
-                $errorMsg = $rawMsg; 
+                $errorMsg = $rawMsg;
             }
 
             return response()->json([
@@ -154,7 +183,7 @@ class ReservaApiController extends Controller
     }
 
 
-    public function cancelar($id)
+    public function cancelarReserva($id)
     {
         try {
             DB::beginTransaction();
@@ -196,7 +225,7 @@ class ReservaApiController extends Controller
         }
     }
 
-    public function finalizar($id)
+    public function finalizarReserva($id)
     {
         try {
             DB::beginTransaction();

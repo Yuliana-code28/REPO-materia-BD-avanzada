@@ -117,7 +117,7 @@ async function manejarEnvioFormulario(e) {
     const metodo = id ? 'PUT' : 'POST';
     const url = id ? `/api/admin/empleados/${id}` : '/api/admin/empleados';
 
-    // Convertir FormData a JSON para PUT (Laravel prefiere JSON para PUT con campos adicionales)
+    // Convertir FormData a JSON para PUT 
     const data = {};
     formData.forEach((value, key) => data[key] = value);
 

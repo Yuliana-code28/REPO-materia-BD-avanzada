@@ -43,6 +43,8 @@ function filtrarYRenderizar() {
     // Filtro por tab (Clasificacion o Top Payer)
     if (clasificacion === 'TOP_PAYERS') {
         filtrados = filtrados.filter(c => c.es_top_pagador === true);
+    } else if (clasificacion === 'FRECUENTES') {
+        filtrados = filtrados.filter(c => c.es_frecuente === true);
     } else if (clasificacion) {
         filtrados = filtrados.filter(c => c.clasificacion === clasificacion);
     }
@@ -77,7 +79,11 @@ function renderizarTabla(datos) {
         else badgeClass = 'badge-nuevo';
 
         const topPayerBadge = cliente.es_top_pagador 
-            ? `<span class="top-payer-badge" title="Su inersión supera el promedio general de ingresos del hotel">✨ TOP PAGADOR</span>` 
+            ? `<span class="top-payer-badge" title="Su inversión supera el promedio general de ingresos del hotel">TOP PAGADOR</span>` 
+            : '';
+
+        const frecuenteBadge = cliente.es_frecuente 
+            ? `<span class="frecuente-badge" title="Supera el promedio de reservaciones del hotel">FRECUENTE</span>` 
             : '';
 
         return `
@@ -86,7 +92,10 @@ function renderizarTabla(datos) {
                 <td>
                     <div style="font-weight: bold; color: var(--text-main); display: flex; flex-direction: column; align-items: flex-start; gap: 0.25rem;">
                         <span>${cliente.nombre_completo}</span>
-                        ${topPayerBadge}
+                        <div style="display: flex; gap: 0.25rem;">
+                            ${topPayerBadge}
+                            ${frecuenteBadge}
+                        </div>
                     </div>
                 </td>
                 <td>

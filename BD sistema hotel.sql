@@ -283,7 +283,7 @@ insert into pagos (id_reserva, monto, metodo_pago, fecha_pago) values
 
 -- Justificación: Se indexa el email de clientes para búsquedas rápidas durante el login y registro.
 -- Se indexa el número de habitación para agilizar la consulta de disponibilidad.
---ya utilizada
+-- ya utilizada
 CREATE INDEX idx_cliente_email ON clientes(email);
 CREATE INDEX idx_habitacion_numero ON habitaciones(numero_habitacion);
 
@@ -296,7 +296,7 @@ DELIMITER //
 -- Función: Calcular Costo de Estancia
 -- Descripción: Calcula el costo base de la habitación multiplicado por los días de estancia.
 -- Problema que resuelve: Permite obtener de forma dinámica y calculada el cobro correcto por cada reserva evitando discrepancias.
--- ya utilizada
+
 CREATE FUNCTION fn_costo_estancia(p_id_reserva INT) 
 RETURNS DECIMAL(10,2)
 DETERMINISTIC
@@ -354,7 +354,7 @@ DELIMITER ;
 
 -- Vista: Reservas (Completa)
 -- Objetivo: Mostrar la información consolidada de las reservas para el dashboard administrativo.
---ya utilizada
+-- ya utilizada
 CREATE VIEW vw_reservas AS 
 SELECT 
     r.id_reserva,
@@ -372,7 +372,7 @@ LEFT JOIN habitaciones h ON dr.id_habitacion = h.id_habitacion;
 
 -- Vista: Historial de Clientes
 -- Objetivo: Resumen estadístico de cada cliente para análisis de mercadeo.
---ya utlizada
+-- ya utilizada
 CREATE VIEW vw_historial_clientes AS
 SELECT 
     c.id_cliente,
@@ -383,6 +383,25 @@ FROM clientes c
 LEFT JOIN reservas r ON c.id_cliente = r.id_cliente
 LEFT JOIN pagos p ON r.id_reserva = p.id_reserva
 GROUP BY c.id_cliente;
+
+-- Vista: Ocupación Actual (Consulta #8)
+-- Objetivo: Ver rápidamente quién ocupa la habitación.
+CREATE VIEW vw_ocupacion_actual AS
+SELECT 
+    h.id_habitacion,
+    h.numero_habitacion,
+    h.estado AS estado_actual,
+    dr.fecha_inicio,
+    dr.fecha_fin,
+    CONCAT(c.nombre, ' ', c.ap) AS ocupante
+FROM habitaciones h
+LEFT JOIN detalle_reservas dr ON h.id_habitacion = dr.id_habitacion
+LEFT JOIN reservas r ON dr.id_reserva = r.id_reserva
+LEFT JOIN clientes c ON r.id_cliente = c.id_cliente
+WHERE (CURDATE() BETWEEN dr.fecha_inicio AND dr.fecha_fin)
+   OR (h.estado = 'ocupada' AND dr.id_detalle = (
+       SELECT MAX(id_detalle) FROM detalle_reservas WHERE id_habitacion = h.id_habitacion
+));
 
 
 -- SECCION DE TRIGGERS
@@ -398,77 +417,115 @@ FOR EACH ROW
 BEGIN
     DECLARE v_conflicto INT;
     
+    -- No permite traslapes con reservaciones que estén 'activa' o 'pendiente'
     SELECT COUNT(*) INTO v_conflicto
-    FROM detalle_reservas
-    WHERE id_habitacion = NEW.id_habitacion
-    AND (
-        (NEW.fecha_inicio BETWEEN fecha_inicio AND fecha_fin) OR
-        (NEW.fecha_fin BETWEEN fecha_inicio AND fecha_fin) OR
-        (fecha_inicio BETWEEN NEW.fecha_inicio AND NEW.fecha_fin)
-    );
+    FROM detalle_reservas dr
+    JOIN reservas r ON dr.id_reserva = r.id_reserva
+    WHERE dr.id_habitacion = NEW.id_habitacion
+    AND r.estado IN ('activa', 'pendiente')
+    AND (NEW.fecha_inicio < dr.fecha_fin AND NEW.fecha_fin > dr.fecha_inicio);
     
     IF v_conflicto > 0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Error: La habitación ya se encuentra ocupada en el periodo seleccionado.';
+        SET MESSAGE_TEXT = 'Error: La habitación ya se encuentra ocupada o reservada en el periodo seleccionado.';
     END IF;
 END //
 
--- Trigger: Evitar Sobreocupación
--- Problema que resuelve: Garantiza que no se marquen más habitaciones como ocupadas de las que físicamente existen.
+-- Trigger
+-- Problema que resuelve: Garantiza que no se marquen más habitaciones como ocupadas.
 CREATE TRIGGER tr_evitar_sobreocupacion
 AFTER INSERT ON detalle_reservas
 FOR EACH ROW
 BEGIN
-    UPDATE habitaciones SET estado = 'ocupada' WHERE id_habitacion = NEW.id_habitacion;
+    DECLARE v_estado_reserva VARCHAR(20);
+    
+    SELECT estado INTO v_estado_reserva 
+    FROM reservas 
+    WHERE id_reserva = NEW.id_reserva;
+
+    -- Solo marca como ocupada si la reserva inicia hoy (estado activa)
+    IF v_estado_reserva = 'activa' THEN
+        UPDATE habitaciones SET estado = 'ocupada' WHERE id_habitacion = NEW.id_habitacion;
+    END IF;
 END //
 
 DELIMITER ;
 
+DELIMITER //
+CREATE TRIGGER tr_liberar_habitacion
+AFTER UPDATE ON reservas
+FOR EACH ROW
+BEGIN
+    -- Si el estado cambia a finalizada o cancelada
+    IF (NEW.estado = 'finalizada' OR NEW.estado = 'cancelada') THEN
+        -- Actualizar la habitación vinculada a disponible
+        UPDATE habitaciones 
+        SET estado = 'disponible'
+        WHERE id_habitacion IN (
+            SELECT id_habitacion 
+            FROM detalle_reservas 
+            WHERE id_reserva = NEW.id_reserva
+        );
+    END IF;
+END //
+DELIMITER ;
 
 -- SECCION DE PROCEDIMIENTOS (TRANSACCIONES)
 
 
 DELIMITER //
 
--- Procedimiento: Registrar Reserva Completa (Atómica)
+-- Procedimiento: Registrar Reserva Completa 
 -- Problema que resuelve: Asegura consistencia; si falla el pago o el detalle, no se guarda la reserva.
+-- Si p_fecha_inicio es hoy o antes: ESTADO = 'activa'
+-- Si p_fecha_inicio es a futuro: ESTADO = 'pendiente'
 CREATE PROCEDURE sp_registrar_reserva(
-    IN p_id_cliente INT,
-    IN p_id_habitacion INT,
-    IN p_fecha_inicio DATE,
-    IN p_fecha_fin DATE,
-    IN p_monto_pago DECIMAL(10,2),
+    IN p_id_cliente INT, 
+    IN p_id_habitacion INT, 
+    IN p_fecha_inicio DATE, 
+    IN p_fecha_fin DATE, 
+    IN p_monto_pago DECIMAL(10,2), 
     IN p_metodo_pago VARCHAR(50)
-)
-BEGIN
-    DECLARE v_id_reserva INT;
-    DECLARE v_costo_calculado DECIMAL(10,2);
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        GET DIAGNOSTICS CONDITION 1 @sqlstate = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;
-        ROLLBACK;
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = @text;
-    END;
+) 
+BEGIN 
+    DECLARE v_id_reserva INT; 
+    DECLARE v_costo_calculado DECIMAL(10,2); 
+    DECLARE v_estado_inicial VARCHAR(20) DEFAULT 'activa';
 
-    START TRANSACTION;
-        -- 1. Insertar en Reservas
+    -- Gestión de errores
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    BEGIN 
+        GET DIAGNOSTICS CONDITION 1 @text = MESSAGE_TEXT; 
+        ROLLBACK; 
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = @text; 
+    END; 
+
+    -- DETERMINACIÓN EL ESTADO
+    IF p_fecha_inicio > CURDATE() THEN
+        SET v_estado_inicial = 'pendiente';
+    END IF;
+
+    START TRANSACTION; 
+        -- 1. Inserción con estado dinámico
         INSERT INTO reservas (id_cliente, fecha_registro, estado) 
-        VALUES (p_id_cliente, CURRENT_TIMESTAMP, 'activa');
-        SET v_id_reserva = LAST_INSERT_ID();
+        VALUES (p_id_cliente, CURRENT_TIMESTAMP, v_estado_inicial); 
+        
+        SET v_id_reserva = LAST_INSERT_ID(); 
+        
+        -- 2. Registro del detalle de estancia
+        INSERT INTO detalle_reservas (id_reserva, id_habitacion, fecha_inicio, fecha_fin) 
+        VALUES (v_id_reserva, p_id_habitacion, p_fecha_inicio, p_fecha_fin); 
+        
+        -- 3. Cálculo automático del costo mediante función almacenada
+        SET v_costo_calculado = fn_costo_estancia(v_id_reserva); 
+        
+        -- 4. Registro del pago inicial vinculado
+        INSERT INTO pagos (id_reserva, monto, metodo_pago, fecha_pago) 
+        VALUES (v_id_reserva, v_costo_calculado, p_metodo_pago, CURRENT_TIMESTAMP); 
+    COMMIT; 
+END // 
 
-        -- 2. Insertar en Detalle (esto activará el trigger de traslapes)
-        INSERT INTO detalle_reservas (id_reserva, id_habitacion, fecha_inicio, fecha_fin)
-        VALUES (v_id_reserva, p_id_habitacion, p_fecha_inicio, p_fecha_fin);
-
-        -- Calculamos el costo con la función en vez de confiar en la entrada del front
-        SET v_costo_calculado = fn_costo_estancia(v_id_reserva);
-
-        -- 3. Insertar Pago
-        INSERT INTO pagos (id_reserva, monto, metodo_pago, fecha_pago)
-        VALUES (v_id_reserva, v_costo_calculado, p_metodo_pago, CURRENT_TIMESTAMP);
-
-    COMMIT;
-END //
+DELIMITER //
 
 -- Procedimiento: Consultar Disponibilidad
 -- Problema que resuelve: Facilita al recepcionista encontrar habitaciones libres rápidamente.
@@ -482,32 +539,12 @@ BEGIN
     JOIN tipos_habitacion th ON h.id_tipo = th.id_tipo
     WHERE h.estado != 'mantenimiento'
     AND h.id_habitacion NOT IN (
-        SELECT id_habitacion 
-        FROM detalle_reservas 
-        WHERE (p_fecha_inicio < fecha_fin AND p_fecha_fin > fecha_inicio)
+        SELECT dr.id_habitacion 
+        FROM detalle_reservas dr
+        JOIN reservas r ON dr.id_reserva = r.id_reserva
+        WHERE r.estado IN ('activa', 'pendiente')
+        AND (p_fecha_inicio < dr.fecha_fin AND p_fecha_fin > dr.fecha_inicio)
     );
 END //
 
 DELIMITER ;
-
--- ==========================================================
--- SECCION DE SEGURIDAD (USUARIOS Y ROLES)
--- ==========================================================
--- Nota: Estos comandos asumen un entorno administrativo de MySQL.
-
--- Crear Roles (Simulado con usuarios)
--- DROP USER IF EXISTS 'admin_user'@'localhost';
--- CREATE USER 'admin_user'@'localhost' IDENTIFIED BY 'admin123';
--- GRANT ALL PRIVILEGES ON sistemahotelero.* TO 'admin_user'@'localhost';
-
--- DROP USER IF EXISTS 'recep_user'@'localhost';
--- CREATE USER 'recep_user'@'localhost' IDENTIFIED BY 'recep123';
--- GRANT SELECT, INSERT, UPDATE ON sistemahotelero.reservas TO 'recep_user'@'localhost';
--- GRANT SELECT, INSERT, UPDATE ON sistemahotelero.detalle_reservas TO 'recep_user'@'localhost';
--- GRANT EXECUTE ON PROCEDURE sistemahotelero.sp_registrar_reserva TO 'recep_user'@'localhost';
-
--- DROP USER IF EXISTS 'cliente_user'@'localhost';
--- CREATE USER 'cliente_user'@'localhost' IDENTIFIED BY 'cliente123';
--- GRANT SELECT ON sistemahotelero.vw_reservas TO 'cliente_user'@'localhost';
--- GRANT SELECT ON sistemahotelero.habitaciones TO 'cliente_user'@'localhost';
-

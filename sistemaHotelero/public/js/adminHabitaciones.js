@@ -44,6 +44,14 @@ function renderizarTabla(datos) {
                         ${estadoCapitalized}
                     </span>
                 </td>
+                <td>
+                    ${habitacion.ocupante ? `
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-weight: bold; color: var(--text-main); font-size: 0.9rem;">${habitacion.ocupante}</span>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">${habitacion.fecha_inicio} al ${habitacion.fecha_fin}</span>
+                        </div>
+                    ` : '<span style="color: var(--text-muted); font-size: 0.85rem;">- Vacía -</span>'}
+                </td>
                 <td class="action-group">
                     <div style="display: flex; gap: 0.6rem;">
                         <button class="filter-btn" style="padding: 0.4rem 0.8rem; background: #f9fafb; color: #374151; border: 1px solid #d1d5db; display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 500; border-radius: 6px; cursor: pointer; transition: all 0.2s;" onclick="abrirModalEdicion(${habitacion.id_habitacion}, '${habitacion.numero_habitacion}', ${habitacion.id_tipo}, '${habitacion.estado}')">

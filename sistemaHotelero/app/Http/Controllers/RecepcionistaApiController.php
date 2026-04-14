@@ -7,10 +7,10 @@ use App\Models\Habitacion;
 use App\Models\Reserva;
 use App\Models\DetalleReserva;
 use Carbon\Carbon;
-
+use \Illuminate\Support\Facades\DB;
 class RecepcionistaApiController extends Controller
 {
-    public function getDashboardData()
+    public function obtenerDatosDashboard()
     {
         $hoy = Carbon::today()->format('Y-m-d');
 
@@ -30,10 +30,10 @@ class RecepcionistaApiController extends Controller
         ]);
     }
 
-    public function checkIn($id)
+    public function registrarCheckIn($id)
     {
         try {
-            \Illuminate\Support\Facades\DB::beginTransaction();
+            DB::beginTransaction();
 
             $reserva = Reserva::findOrFail($id);
             $reserva->update(['estado' => 'activa']);
@@ -41,11 +41,11 @@ class RecepcionistaApiController extends Controller
             // Obtener habitaciones de la reserva para marcarlas como ocupadas
             $reserva->habitaciones()->update(['estado' => 'ocupada']);
 
-            \Illuminate\Support\Facades\DB::commit();
+            DB::commit();
 
             return response()->json(['success' => true, 'message' => 'Check-in realizado correctamente.']);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\DB::rollBack();
+            DB::rollBack();
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }

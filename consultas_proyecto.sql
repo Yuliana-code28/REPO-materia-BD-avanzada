@@ -1,4 +1,4 @@
-W
+
 -- CONSULTAS DEL PROYECTO FINAL - SISTEMA HOTELERO
 
 
@@ -72,29 +72,3 @@ WHERE total_reservas > (SELECT AVG(total_reservas) FROM (
     SELECT fn_total_reservas_cliente(id_cliente) AS total_reservas FROM clientes
 ) AS sub);
 
--- 8. Mostrar ocupación de habitaciones por fecha
--- Objetivo: Reporte de ocupación diaria para limpieza y mantenimiento.
-SELECT 
-    h.numero_habitacion,
-    h.estado AS estado_actual,
-    dr.fecha_inicio,
-    dr.fecha_fin,
-    CONCAT(c.nombre, ' ', c.ap) AS ocupante
-FROM habitaciones h
-LEFT JOIN detalle_reservas dr ON h.id_habitacion = dr.id_habitacion
-LEFT JOIN reservas r ON dr.id_reserva = r.id_reserva
-LEFT JOIN clientes c ON r.id_cliente = c.id_cliente
-WHERE CURDATE() BETWEEN dr.fecha_inicio AND dr.fecha_fin;
-
--- 9. Consultar cotización de nueva reserva (Uso de función fn_calcular_costo_proyectado)
--- Objetivo: Mostrar cuánto costaría hospedar a un cliente en la habitación 10 (cabaña familiar) por 5 días.
--- Esta consulta demuestra el uso obligatorio de todas las funciones según la rúbrica.
-SELECT 
-    h.numero_habitacion,
-    th.nombre_tipo,
-    CURDATE() + INTERVAL 7 DAY AS fecha_inicio_proyectada,
-    CURDATE() + INTERVAL 12 DAY AS fecha_fin_proyectada,
-    fn_calcular_costo_proyectado(h.id_habitacion, CURDATE() + INTERVAL 7 DAY, CURDATE() + INTERVAL 12 DAY) AS costo_estimado
-FROM habitaciones h
-JOIN tipos_habitacion th ON h.id_tipo = th.id_tipo
-WHERE h.id_habitacion = 10;
